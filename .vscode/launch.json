@@ -1,0 +1,22 @@
+{
+    // https://code.visualstudio.com/docs/languages/rust
+    "version": "0.2.0",
+    "configurations": [
+        // {
+        //     "name": "Attach Debug Rust",
+        //     "sourceLanguages": ["rust"],
+        //     "type": "lldb",
+        //     "request": "attach",
+        //     "waitFor": true,
+        //     "pid": "${command:pickMyProcess}"
+        // },
+        {
+            "name": "Launch Debug Rust",
+            "sourceLanguages": ["rust"],
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceRoot}/target/debug/${workspaceRootFolderName}",
+            "cwd": "${workspaceFolder}/target/debug/"
+        }
+    ]
+}

@@ -1,0 +1,11 @@
+{
+	// List of extensions which should be recommended for users of this workspace.
+	// https://code.visualstudio.com/docs/languages/rust	
+	"recommendations": [
+		"rust-lang.rust-analyzer",
+		"vadimcn.vscode-lldb"
+	],
+	"unwantedRecommendations": [
+		
+	]
+}
