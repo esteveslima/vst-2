@@ -2,8 +2,9 @@
 	// List of extensions which should be recommended for users of this workspace.
 	// https://code.visualstudio.com/docs/languages/rust	
 	"recommendations": [
-		"rust-lang.rust-analyzer",
-		"vadimcn.vscode-lldb"
+		"rust-lang.rust-analyzer",	// Language support
+		"vadimcn.vscode-lldb",	// Debugger
+		"ms-vscode-remote.remote-containers" // Connect VSCode into a docker environment
 	],
 	"unwantedRecommendations": [
 		

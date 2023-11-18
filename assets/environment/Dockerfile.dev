@@ -1,0 +1,26 @@
+# Setting up a nest container as development environment
+
+# Use the official image
+# P.S.: Not using alpine version to include extra tooling to allow working with attached debugger in container environment
+FROM rust as builderStage
+
+# Install extra useful packages for alpine version
+RUN apt-get install bash curl && \
+    apt-get install git
+
+# Install development packages
+RUN cargo install cargo-watch
+
+# Change and config user
+ENV EDITOR=nano
+ENV LESS=R
+RUN echo "complete -d cd" >> ~/.bashrc
+RUN echo "PS1='\e[1;30m(\t)[\w]\$ \e[0m'" >> ~/.bashrc; . ~/.bashrc
+
+WORKDIR /rust-container
+
+# Expose some usable ports
+EXPOSE 3000-3100
+
+# Keeps de container running
+CMD tail -f /dev/null

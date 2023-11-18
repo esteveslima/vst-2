@@ -2,21 +2,22 @@
     // https://code.visualstudio.com/docs/languages/rust
     "version": "0.2.0",
     "configurations": [
-        // {
-        //     "name": "Attach Debug Rust",
-        //     "sourceLanguages": ["rust"],
-        //     "type": "lldb",
-        //     "request": "attach",
-        //     "waitFor": true,
-        //     "pid": "${command:pickMyProcess}"
-        // },
         {
-            "name": "Launch Debug Rust",
+            "name": "Attach Debug Rust",
             "sourceLanguages": ["rust"],
             "type": "lldb",
-            "request": "launch",
-            "program": "${workspaceRoot}/target/debug/${workspaceRootFolderName}",
-            "cwd": "${workspaceFolder}/target/debug/"
-        }
+            "request": "attach",            
+            "pid": "${command:pickProcess}",    // For rust projects, usually look for the process running the /target/debug/{PROJECT_NAME}
+        },
+        // {
+        //     "name": "Launch Debug Rust",
+        //     "sourceLanguages": ["rust"],
+        //     "type": "lldb",
+        //     "request": "launch",
+        //     "program": "${workspaceRoot}/target/debug/${workspaceRootFolderName}",
+        //     "cwd": "${workspaceFolder}/target/debug/"
+        // }
     ]
 }
+// P.S.1: For docker environment, open vscode into the container with a plugin and make the required installs/adjustments
+// P.S.2: Might be necessary to follow some instructions from warnings/errors given by vscode when trying use the debugger
