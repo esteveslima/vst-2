@@ -1,5 +1,8 @@
-use serde::{Deserialize, Serialize};
 use std;
+use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
+
+use crate::features::stocks::application::interfaces::use_case::UseCase;
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct PurchaseStockParametersDTO {
@@ -16,14 +19,19 @@ pub struct PurchaseStockResultDTO {
 
 //
 
-pub async fn use_case(
-    params: PurchaseStockParametersDTO,
-) -> Result<PurchaseStockResultDTO, Box<dyn std::error::Error>> {
-    let result = PurchaseStockResultDTO {
-        stock: params.stock,
-        shares: params.shares,
-        price: 123.45,
-    };
+pub struct PurchaseStockUseCase {}
 
-    return Ok(result);
+#[async_trait]
+impl UseCase<PurchaseStockParametersDTO, PurchaseStockResultDTO> for PurchaseStockUseCase {
+    async fn execute(
+        params: PurchaseStockParametersDTO,
+    ) -> Result<PurchaseStockResultDTO, Box<dyn std::error::Error>> {
+        let result = PurchaseStockResultDTO {
+            stock: params.stock,
+            shares: params.shares,
+            price: 123.00,
+        };
+    
+        return Ok(result);
+    }
 }

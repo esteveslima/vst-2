@@ -2,10 +2,11 @@ use std::convert::Infallible;
 use validator::Validate;
 use warp::{reply::Reply, Filter};
 
+use crate::features::stocks::adapters::entrypoints::model::api_response::APIResponse;
 use crate::features::stocks::adapters::entrypoints::controllers::dtos::get_stocks_summary_rest_dto;
 use crate::features::stocks::adapters::entrypoints::controllers::dtos::purchase_stock_rest_dto;
 use crate::features::stocks::adapters::entrypoints::controllers::dtos::sell_stock_rest_dto;
-use crate::features::stocks::adapters::entrypoints::model::api_response::APIResponse;
+use crate::features::stocks::application::interfaces::use_case::UseCase;
 use crate::features::stocks::application::use_cases::get_stocks_summary_use_case;
 use crate::features::stocks::application::use_cases::purchase_stock_use_case;
 use crate::features::stocks::application::use_cases::sell_stock_use_case;
@@ -37,7 +38,7 @@ pub fn build_controller(
             stock: body.stock,
         };
 
-        let use_case_result = purchase_stock_use_case::use_case(params).await;
+        let use_case_result = purchase_stock_use_case::PurchaseStockUseCase::execute(params).await;
 
         match use_case_result {
             Ok(result) => {
@@ -84,7 +85,7 @@ pub fn build_controller(
             stock: body.stock,
         };
 
-        let use_case_result = sell_stock_use_case::use_case(params).await;
+        let use_case_result = sell_stock_use_case::SellStockUseCase::execute(params).await;
 
         match use_case_result {
             Ok(result) => {
@@ -120,7 +121,7 @@ pub fn build_controller(
     async fn get_stocks_summary() -> Result<impl Reply, Infallible> {
         let params = get_stocks_summary_use_case::GetStocksSummaryParametersDTO {};
 
-        let use_case_result = get_stocks_summary_use_case::use_case(params).await;
+        let use_case_result = get_stocks_summary_use_case::GetStocksSummaryUseCase::execute(params).await;
 
         match use_case_result {
             Ok(result) => {

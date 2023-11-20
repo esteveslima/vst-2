@@ -17,6 +17,9 @@ pub mod adapters {
 }
 
 pub mod application {
+    pub mod interfaces {
+        pub mod use_case;
+    }
     pub mod use_cases {
         pub mod get_stocks_summary_use_case;
         pub mod purchase_stock_use_case;
