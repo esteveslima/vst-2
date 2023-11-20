@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use chrono::Utc;
 
-use crate::features::stocks::application::interfaces::use_case::UseCase;
+use crate::features::stocks_api::application::interfaces::use_case::UseCase;
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct GetStocksSummaryParametersDTO {}

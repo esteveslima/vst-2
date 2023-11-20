@@ -2,14 +2,14 @@ use std::convert::Infallible;
 use validator::Validate;
 use warp::{reply::Reply, Filter};
 
-use crate::features::stocks::adapters::entrypoints::model::api_response::APIResponse;
-use crate::features::stocks::adapters::entrypoints::controllers::dtos::get_stocks_summary_rest_dto;
-use crate::features::stocks::adapters::entrypoints::controllers::dtos::purchase_stock_rest_dto;
-use crate::features::stocks::adapters::entrypoints::controllers::dtos::sell_stock_rest_dto;
-use crate::features::stocks::application::interfaces::use_case::UseCase;
-use crate::features::stocks::application::use_cases::get_stocks_summary_use_case;
-use crate::features::stocks::application::use_cases::purchase_stock_use_case;
-use crate::features::stocks::application::use_cases::sell_stock_use_case;
+use crate::features::stocks_api::adapters::entrypoints::model::api_response::APIResponse;
+use crate::features::stocks_api::adapters::entrypoints::controllers::dtos::get_stocks_summary_rest_dto;
+use crate::features::stocks_api::adapters::entrypoints::controllers::dtos::purchase_stock_rest_dto;
+use crate::features::stocks_api::adapters::entrypoints::controllers::dtos::sell_stock_rest_dto;
+use crate::features::stocks_api::application::interfaces::use_case::UseCase;
+use crate::features::stocks_api::application::use_cases::get_stocks_summary_use_case;
+use crate::features::stocks_api::application::use_cases::purchase_stock_use_case;
+use crate::features::stocks_api::application::use_cases::sell_stock_use_case;
 
 pub fn build_controller(
 ) -> impl warp::Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
