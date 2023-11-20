@@ -2,10 +2,10 @@ use std::convert::Infallible;
 use validator::Validate;
 use warp::{reply::Reply, Filter};
 
-use crate::features::stocks_api::adapters::entrypoints::model::api_response::APIResponse;
 use crate::features::stocks_api::adapters::entrypoints::controllers::dtos::get_stocks_summary_rest_dto;
 use crate::features::stocks_api::adapters::entrypoints::controllers::dtos::purchase_stock_rest_dto;
 use crate::features::stocks_api::adapters::entrypoints::controllers::dtos::sell_stock_rest_dto;
+use crate::features::stocks_api::adapters::entrypoints::model::api_response::APIResponse;
 use crate::features::stocks_api::application::interfaces::use_case::UseCase;
 use crate::features::stocks_api::application::use_cases::get_stocks_summary_use_case;
 use crate::features::stocks_api::application::use_cases::purchase_stock_use_case;
@@ -33,9 +33,13 @@ pub fn build_controller(
                 ))
             }
         }
+        let mock_user_id = 0;
         let params = purchase_stock_use_case::PurchaseStockParametersDTO {
-            shares: body.shares,
-            stock: body.stock,
+            user_id: mock_user_id,
+            payload: purchase_stock_use_case::PurchaseStockParametersPayloadDTO {
+                shares: body.shares,
+                stock: body.stock,
+            },
         };
 
         let use_case_result = purchase_stock_use_case::PurchaseStockUseCase::execute(params).await;
@@ -80,9 +84,13 @@ pub fn build_controller(
                 ))
             }
         }
+        let mock_user_id = 0;
         let params = sell_stock_use_case::SellStockParametersDTO {
-            shares: body.shares,
-            stock: body.stock,
+            user_id: mock_user_id,
+            payload: sell_stock_use_case::SellStockParametersPayloadDTO {
+                shares: body.shares,
+                stock: body.stock,
+            },
         };
 
         let use_case_result = sell_stock_use_case::SellStockUseCase::execute(params).await;
@@ -119,9 +127,13 @@ pub fn build_controller(
         .and(warp::get())
         .and_then(get_stocks_summary);
     async fn get_stocks_summary() -> Result<impl Reply, Infallible> {
-        let params = get_stocks_summary_use_case::GetStocksSummaryParametersDTO {};
+        let mock_user_id = 0;
+        let params = get_stocks_summary_use_case::GetStocksSummaryParametersDTO {
+            user_id: mock_user_id,
+        };
 
-        let use_case_result = get_stocks_summary_use_case::GetStocksSummaryUseCase::execute(params).await;
+        let use_case_result =
+            get_stocks_summary_use_case::GetStocksSummaryUseCase::execute(params).await;
 
         match use_case_result {
             Ok(result) => {

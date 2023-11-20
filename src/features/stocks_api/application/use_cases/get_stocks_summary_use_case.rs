@@ -1,12 +1,16 @@
-use std;
 use async_trait::async_trait;
-use serde::{Deserialize, Serialize};
 use chrono::Utc;
+use serde::{Deserialize, Serialize};
+use std;
 
 use crate::features::stocks_api::application::interfaces::use_case::UseCase;
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct GetStocksSummaryParametersDTO {}
+pub struct GetStocksSummaryParametersDTO {
+    pub user_id: usize,
+}
+
+//
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct GetStocksSummaryResultDTO {
@@ -20,8 +24,7 @@ pub struct GetStocksSummaryResultDTO {
     pub day_max: f32,
 }
 
-
-//
+// // //
 
 pub struct GetStocksSummaryUseCase {}
 
@@ -40,7 +43,7 @@ impl UseCase<GetStocksSummaryParametersDTO, GetStocksSummaryResultDTO> for GetSt
             day_avg: 0.0,
             day_min: 0.0,
         };
-    
+
         return Ok(result);
     }
 }
