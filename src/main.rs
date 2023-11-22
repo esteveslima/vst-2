@@ -1,29 +1,23 @@
-use dotenv;
-use warp::Filter;
+use infrastructure::{
+    configurations::env::{EnvLoader, EnvLoaderTrait},
+    web::web_server::{WebServer, WebServerTrait},
+};
 
+pub mod infrastructure {
+    pub mod configurations {
+        pub mod env;
+    }
+    pub mod web {
+        pub mod web_server;
+    }
+}
 pub mod features {
     pub mod stocks_api;
 }
 
 #[tokio::main]
-async fn main() {    
-    load_env();
+async fn main() {
+    EnvLoader::load();
 
-    let stocks_controller =
-        features::stocks_api::adapters::entrypoints::controllers::stock_controller::build_controller();
-
-    let routers = warp::any().and(stocks_controller);
-
-    warp::serve(routers).run(([0, 0, 0, 0], 3030)).await;
-}
-
-//
-
-fn load_env() {
-    let path = "assets/environment/.env";
-    let env_load_result = dotenv::from_path(path);
-
-    if env_load_result.is_err() {
-        println!("No .env file found. Using default or system environment variables.");
-    }
+    WebServer::start().await;
 }
