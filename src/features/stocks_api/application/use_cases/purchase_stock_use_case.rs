@@ -1,6 +1,5 @@
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
-use std;
 
 use crate::features::stocks_api::application::interfaces::use_case::UseCase;
 

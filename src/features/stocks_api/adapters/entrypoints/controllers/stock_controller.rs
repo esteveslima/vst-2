@@ -47,6 +47,7 @@ pub fn build_controller(
         match use_case_result {
             Ok(result) => {
                 let response = purchase_stock_rest_dto::PurchaseStockRestResponseDTO {
+                    id: result.id,
                     price: result.price,
                     shares: result.shares,
                     stock: result.stock,
@@ -98,6 +99,7 @@ pub fn build_controller(
         match use_case_result {
             Ok(result) => {
                 let response = sell_stock_rest_dto::SellStockRestResponseDTO {
+                    id: result.id,
                     price: result.price,
                     shares: result.shares,
                     stock: result.stock,

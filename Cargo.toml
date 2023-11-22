@@ -6,13 +6,14 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dev-dependencies]
-cargo-watch = "8.4.1"
+cargo-watch = "8.4.1"                                           # development hot reload
 
 [dependencies]
-tokio = { version = "1", features = ["full"] }
-async-trait = "0.1.74"
-warp = "0.3"
-serde = { version = "1.0.192", features = ["derive"] }
-serde_json = "1.0.108"
-validator = { version = "0.16", features = ["derive"] }
-chrono = "0.4.31"
+tokio = { version = "1", features = ["full"] }                  # async runtime
+warp = "0.3"                                                    # async http web framework
+async-trait = "0.1.74"                                          # enable async traits
+dotenv = "0.15.0"                                               # load env variables(dev environment only)
+serde = { version = "1.0.192", features = ["derive"] }          # serialization
+serde_json = "1.0.108"                                          # serialization for json
+validator = { version = "0.16", features = ["derive"] }         # validator for structs
+chrono = "0.4.31"                                               # datetime utils

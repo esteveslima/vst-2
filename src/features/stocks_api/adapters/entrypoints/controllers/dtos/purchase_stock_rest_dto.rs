@@ -14,6 +14,7 @@ pub struct PurchaseStockRestRequestBodyDTO {
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct PurchaseStockRestResponseDTO {
+    pub id: usize,
     pub stock: String,
     pub shares: usize,
     pub price: f32,
