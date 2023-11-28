@@ -1,17 +1,17 @@
 use dotenv;
 
-pub trait EnvLoaderTrait {
-    fn load();
+pub trait EnvTrait {
+    fn setup();
 }
 
-pub struct EnvLoader;
+pub struct Env;
 
-impl EnvLoaderTrait for EnvLoader {
-    fn load() {
+impl EnvTrait for Env {
+    fn setup() {
         let path = "assets/environment/.env";
-        let env_load_result = dotenv::from_path(path);
+        let env_setup_result = dotenv::from_path(path);
 
-        if env_load_result.is_err() {
+        if env_setup_result.is_err() {
             println!("No .env file found. Using default or system environment variables.");
         }
     }

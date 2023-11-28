@@ -9,15 +9,16 @@
             "request": "attach",            
             "pid": "${command:pickProcess}",    // For rust projects, usually look for the process running the /target/debug/{PROJECT_NAME}
         },
-        // {
-        //     "name": "Launch Debug Rust",
-        //     "sourceLanguages": ["rust"],
-        //     "type": "lldb",
-        //     "request": "launch",
-        //     "program": "${workspaceRoot}/target/debug/${workspaceRootFolderName}",
-        //     "cwd": "${workspaceFolder}/target/debug/"
-        // }
+        {
+            "name": "Launch Debug Rust",
+            "sourceLanguages": ["rust"],
+            "type": "lldb",
+            "request": "launch",
+            // "program": "${workspaceRoot}/target/debug/${workspaceRootFolderName}",
+            "program": "${workspaceRoot}/target/debug/vst-2",
+            "cwd": "${workspaceFolder}/target/debug/"
+        }
     ]
 }
-// P.S.1: For docker environment, open vscode into the container with a plugin and make the required installs/adjustments
+// P.S.1: For docker environment, open vscode into the container with a plugin and make the required installs/adjustments(beware of new folder names and paths mounted)
 // P.S.2: Might be necessary to follow some instructions from warnings/errors given by vscode when trying use the debugger

@@ -23,4 +23,7 @@ But this time in Rust!
   - simple run: `cargo run`
   - run development(hot reload): `cargo watch --watch src --exec run`
 
-- Debug Project: Use the preferrable launch config to attach into the running application, look for `/target/debug/{PROJECT_NAME}` process to attach
+- Debug Project:
+    - Use the preferrable attach config to attach into the running application, look for `/target/debug/{PROJECT_NAME}` process to attach
+    - Otherwise launch the application in debug mode directly, it'll refer to `/target/debug/{PROJECT_NAME}`
+      - P.S.: might be necessary to build the project manually to update the debug file before launching it in debug mode

@@ -17,3 +17,4 @@ serde = { version = "1.0.192", features = ["derive"] }          # serialization
 serde_json = "1.0.108"                                          # serialization for json
 validator = { version = "0.16", features = ["derive"] }         # validator for structs
 chrono = "0.4.31"                                               # datetime utils
+rdkafka = "0.36.0"                                              # kafka client

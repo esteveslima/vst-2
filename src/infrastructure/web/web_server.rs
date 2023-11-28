@@ -3,14 +3,15 @@ use warp::Filter;
 
 #[async_trait]
 pub trait WebServerTrait {
-    async fn start();
+    //TODO: refactor to be like the stream consumer
+    async fn setup();
 }
 
 pub struct WebServer;
 
 #[async_trait]
 impl WebServerTrait for WebServer {
-    async fn start() {
+    async fn setup() {
         let stocks_controller = crate::features::stocks_api::adapters::entrypoints::controllers::stock_controller::build_controller();
 
         let routers = warp::any().and(stocks_controller);

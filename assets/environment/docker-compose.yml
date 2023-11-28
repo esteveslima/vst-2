@@ -17,35 +17,65 @@ services:
         restart: "no"
         ports:
             - 3030:3030
-            - "9229:9229"                                            # VSCode debugger port
 
-   #  postgres-container:                                              # Setting up local testing environment with postgres
-   #      image: postgres
-   #      volumes:
-   #         - ./.volumes/.postgres-storage:/var/lib/postgresql/data
-   #      environment:
-   #         - POSTGRES_USER=postgres
-   #         - POSTGRES_PASSWORD=password
-   #         - POSTGRES_DB=postgres-db
-   #      restart: always
-   #      expose:
-   #         - '5432'
-   #      ports:
-   #         - '5432:5432'
-   #  pgadmin-container:                                                 # Setting up postgres admin interface(remember to connect to container, which is in docker internal network)
-   #      image: dpage/pgadmin4                                          # Take some time to boot up      
-   #      volumes:           
-   #         - ./.volumes/.pgadmin-storage/pgadmin4/servers.json:/pgadmin4/servers.json     # Bind pgadmin configs to local folder(not working)
-   #      environment:
-   #         - PGADMIN_DEFAULT_EMAIL=postgres@postgres.com
-   #         - PGADMIN_DEFAULT_PASSWORD=password
-   #         - PGADMIN_LISTEN_ADDRESS=0.0.0.0
-   #         - PGADMIN_LISTEN_PORT=5433
-   #      restart: always        
-   #      expose:
-   #         - '5433'             
-   #      ports:
-   #         - '5433:5433'                                                 # interface available at http://localhost:5433
+    kafka-container:                                                # Setting up local testing environment with kafka
+        image: bitnami/kafka
+        # volumes:
+        #     - ./.volumes/.kafka-storage:/bitnami
+        environment:
+            - KAFKA_CFG_NODE_ID=0
+            - KAFKA_CFG_PROCESS_ROLES=controller,broker
+            - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+            - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+            - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka-container:9093
+            - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+            - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+            - KAFKA_JMX_PORT=9997
+        restart: "no"
+        expose:
+            - '9092'
+            - '9997'
+        # ports:
+        # - '9092:9092'
+    kafka-ui-container:                                             # Setting up kafka admin interface
+        image: provectuslabs/kafka-ui        
+        environment:
+            - DYNAMIC_CONFIG_ENABLED=true
+            - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka-container:9092
+            - KAFKA_CLUSTERS_0_METRICS_PORT=9997
+        restart: always
+        depends_on:
+            - kafka-container
+        ports:
+            - 8080:8080                                                # interface available at http://localhost:8080
+
+    # postgres-container:                                              # Setting up local testing environment with postgres
+    #     image: postgres
+    #     volumes:
+    #        - ./.volumes/.postgres-storage:/var/lib/postgresql/data
+    #     environment:
+    #        - POSTGRES_USER=postgres
+    #        - POSTGRES_PASSWORD=password
+    #        - POSTGRES_DB=postgres-db
+    #     restart: always
+    #     expose:
+    #        - '5432'
+    #     ports:
+    #        - '5432:5432'
+    # pgadmin-container:                                                 # Setting up postgres admin interface(remember to connect to container, which is in docker internal network)
+    #     image: dpage/pgadmin4                                          # Take some time to boot up      
+    #     volumes:           
+    #        - ./.volumes/.pgadmin-storage/pgadmin4/servers.json:/pgadmin4/servers.json     # Bind pgadmin configs to local folder(not working)
+    #     environment:
+    #        - PGADMIN_DEFAULT_EMAIL=postgres@postgres.com
+    #        - PGADMIN_DEFAULT_PASSWORD=password
+    #        - PGADMIN_LISTEN_ADDRESS=0.0.0.0
+    #        - PGADMIN_LISTEN_PORT=5433
+    #     restart: always        
+    #     expose:
+    #        - '5433'             
+    #     ports:
+    #        - '5433:5433'                                              # interface available at http://localhost:5433
 
     # mysql-container:                                                  # Setting up local testing environment with mysql
     #     image: mysql
@@ -89,19 +119,19 @@ services:
     #        - '27017'                         
     #     # ports:
     #     #     - '27017:27017'
-    #  compass-container:                                              # Setting up mongodb compass UI at http://localhost:27018/
-    #      image: mongo-express
-    #      environment:
-    #          - ME_CONFIG_MONGODB_SERVER=mongo-container
-    #          - ME_CONFIG_MONGODB_PORT=27017            
-    #          - ME_CONFIG_MONGODB_ADMINUSERNAME=user
-    #          - ME_CONFIG_MONGODB_ADMINPASSWORD=pass
-    #          - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
-    #      restart: "no"
-    #      depends_on:
-    #          - mongo-container
-    #      ports:
-    #          - '27018:8081'
+    # compass-container:                                              # Setting up mongodb compass UI at http://localhost:27018/
+    #     image: mongo-express
+    #     environment:
+    #         - ME_CONFIG_MONGODB_SERVER=mongo-container
+    #         - ME_CONFIG_MONGODB_PORT=27017            
+    #         - ME_CONFIG_MONGODB_ADMINUSERNAME=user
+    #         - ME_CONFIG_MONGODB_ADMINPASSWORD=pass
+    #         - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+    #     restart: "no"
+    #     depends_on:
+    #         - mongo-container
+    #     ports:
+    #         - '27018:8081'
 
     # dynamodb-container:                                              # Setting up DynamoDB local testing environment with dynamoDB local
     #     image: amazon/dynamodb-local
@@ -116,29 +146,29 @@ services:
     #     ports:
     #         - '8000:8000'                                             # shell interface available at http://localhost:8000/shell/  
             
-   #  redis-container:                                                  # Setting up local testing environment with redis
-   #      image: redis
-   #      command: ["redis-server", "--appendonly", "yes"]
-   #      volumes:
-   #         - ./.volumes/.redis-storage:/data
-   #      #environment:
-   #      restart: always
-   #      expose:
-   #         - '6379'
-   #      # ports:
-   #      #    - '6379:6379'
-   #  redis-commander-communication-service:                            # Setting up redis UI at http://localhost:6380/
-   #      image: rediscommander/redis-commander:latest
-   #      restart: "no"
-   #      depends_on:
-   #          - redis-container
-   #      environment:
-   #          - REDIS_HOSTS=`
-   #              local:redis-container:6379:0:redispassword,
-   #              local:redis-container:6379:1:redispassword
-   #              `
-   #      ports:
-   #          - "6380:8081"
+    # redis-container:                                                  # Setting up local testing environment with redis
+    #     image: redis
+    #     command: ["redis-server", "--appendonly", "yes"]
+    #     volumes:
+    #        - ./.volumes/.redis-storage:/data
+    #     #environment:
+    #     restart: always
+    #     expose:
+    #        - '6379'
+    #     # ports:
+    #     #    - '6379:6379'
+    # redis-commander-communication-service:                            # Setting up redis UI at http://localhost:6380/
+    #     image: rediscommander/redis-commander:latest
+    #     restart: "no"
+    #     depends_on:
+    #         - redis-container
+    #     environment:
+    #         - REDIS_HOSTS=`
+    #             local:redis-container:6379:0:redispassword,
+    #             local:redis-container:6379:1:redispassword
+    #             `
+    #     ports:
+    #         - "6380:8081"
 
     # queue-container:                                                   # Setting up local testing environment with elasticMQ
     #     image: softwaremill/elasticmq-native
