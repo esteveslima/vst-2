@@ -10,6 +10,9 @@ pub mod adapters {
                 pub mod sell_stock_rest_dto;
             }
         }
+        pub mod consumers {
+            pub mod stock_consumer;
+        }
         pub mod model {
             pub mod api_response;
         }

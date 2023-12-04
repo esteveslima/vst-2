@@ -14,10 +14,9 @@ pub struct StreamProducerClientSetupParameters {
 }
 
 #[async_trait]
-pub trait StreamProducerClientTrait {
-    //TODO: refactor from owned parameters to borrowed parameters
+pub trait StreamProducerClientTrait {    
     fn setup(params: StreamProducerClientSetupParameters) -> Self;
-    async fn send<T: Serialize + Send>(
+    async fn produce<T: Serialize + Send>(
         &self,
         payload: T,
         key: Option<String>,
@@ -45,7 +44,7 @@ impl StreamProducerClientTrait for StreamProducerClient {
         return StreamProducerClient { producer, params };
     }
 
-    async fn send<T: Serialize + Send>(
+    async fn produce<T: Serialize + Send>(
         &self,
         payload: T,
         optional_key: Option<String>,
