@@ -1,6 +1,6 @@
 use std::convert::Infallible;
 use validator::Validate;
-use warp::{reply::Reply, Filter};
+use warp::reply::Reply;
 
 use crate::features::stocks_api::adapters::entrypoints::controllers::dtos::get_stocks_summary_rest_dto;
 use crate::features::stocks_api::adapters::entrypoints::controllers::dtos::purchase_stock_rest_dto;
@@ -11,18 +11,11 @@ use crate::features::stocks_api::application::use_cases::get_stocks_summary_use_
 use crate::features::stocks_api::application::use_cases::purchase_stock_use_case;
 use crate::features::stocks_api::application::use_cases::sell_stock_use_case;
 
-pub fn build_controller(
-) -> impl warp::Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
-    let base_route = warp::path("stocks");
+pub struct StockController;
 
-    //  POST /stocks/purchase
-    let purchase_stock_route = base_route
-        .and(warp::path!("purchase"))
-        .and(warp::post())
-        .and(warp::body::json())
-        .and_then(purchase_stock);
-    async fn purchase_stock(
-        body: purchase_stock_rest_dto::PurchaseStockRestRequestBodyDTO,
+impl StockController {
+    pub async fn purchase_stock(
+        body: purchase_stock_rest_dto::PurchaseStockRestRequestBodyDTO
     ) -> Result<impl Reply, Infallible> {
         match body.validate() {
             Ok(_) => (),
@@ -67,13 +60,7 @@ pub fn build_controller(
         }
     }
 
-    //  POST /stocks/sell
-    let sell_stock_route = base_route
-        .and(warp::path!("sell"))
-        .and(warp::post())
-        .and(warp::body::json())
-        .and_then(sell_stock);
-    async fn sell_stock(
+    pub async fn sell_stock(
         body: sell_stock_rest_dto::SellStockRestRequestBodyDTO,
     ) -> Result<impl Reply, Infallible> {
         match body.validate() {
@@ -123,12 +110,7 @@ pub fn build_controller(
         }
     }
 
-    // GET /stocks/summary
-    let get_stocks_summary_route = base_route
-        .and(warp::path!("summary"))
-        .and(warp::get())
-        .and_then(get_stocks_summary);
-    async fn get_stocks_summary() -> Result<impl Reply, Infallible> {
+    pub async fn get_stocks_summary() -> Result<impl Reply, Infallible> {
         let mock_user_id = 0;
         let params = get_stocks_summary_use_case::GetStocksSummaryParametersDTO {
             user_id: mock_user_id,
@@ -168,11 +150,5 @@ pub fn build_controller(
         }
     }
 
-    //
-
-    let controller_router = warp::any()
-        .and(purchase_stock_route)
-        .or(sell_stock_route)
-        .or(get_stocks_summary_route);
-    return controller_router;
+    //...
 }

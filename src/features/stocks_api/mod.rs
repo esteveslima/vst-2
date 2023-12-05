@@ -3,7 +3,7 @@
 pub mod adapters {
     pub mod entrypoints {
         pub mod controllers {
-            pub mod stock_controller;
+            pub mod stock_controller;            
             pub mod dtos {
                 pub mod get_stocks_summary_rest_dto;
                 pub mod purchase_stock_rest_dto;
@@ -27,5 +27,12 @@ pub mod application {
         pub mod get_stocks_summary_use_case;
         pub mod purchase_stock_use_case;
         pub mod sell_stock_use_case;
+    }
+}
+
+pub mod infrastructure {
+    pub mod routers {
+        pub mod stock_consumer_router;
+        pub mod stock_controller_router;
     }
 }

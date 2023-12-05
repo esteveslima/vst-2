@@ -1,21 +1,25 @@
 use infrastructure::{
     configurations::{
-        stream_consumer_runner::{StreamConsumerRunner, StreamConsumerRunnerTrait},
-        env::{Env, EnvTrait},
+        env_loader,        
+    },
+    runners::{
+        web_server_runner,
+        stream_consumer_runner,
     },
     stream::client::stream_producer_client::{
         StreamProducerClient, StreamProducerClientSetupParameters, StreamProducerClientTrait,
-    },
-    web::web_server::{WebServer, WebServerTrait},
+    }
+    
 };
 
 pub mod infrastructure {
     pub mod configurations {
-        pub mod stream_consumer_runner;
-        pub mod env;
+        pub mod env_loader;        
     }
-    pub mod web {
-        pub mod web_server;
+
+    pub mod runners {
+        pub mod web_server_runner;
+        pub mod stream_consumer_runner;
     }
     pub mod stream {
         pub mod client {
@@ -31,7 +35,7 @@ use serde::{Deserialize, Serialize};
 
 #[tokio::main]
 async fn main() {
-    Env::setup();
+    env_loader::setup_env_config();
 
     let test_broker = std::env::var("STOCK_KAFKA_BROKER_HOST").unwrap_or("".to_string());
     let test_topic = std::env::var("STOCK_KAFKA_TOPIC").unwrap_or("".to_string());
@@ -49,8 +53,8 @@ async fn main() {
         .produce(test_payload.clone(), Some(test_key.clone()))
         .await;
 
-    let web_server = WebServer::setup();
-    let consumer_runner = StreamConsumerRunner::setup();
+    let web_server_runner = web_server_runner::setup_web_server_runner();
+    let stream_consumer_runner = stream_consumer_runner::setup_stream_consumer_runner();
 
-    tokio::join!(web_server, consumer_runner);
+    tokio::join!(web_server_runner, stream_consumer_runner);
 }
