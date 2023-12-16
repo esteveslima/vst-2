@@ -3,7 +3,7 @@ use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use std;
 
-use crate::features::stocks_api::application::interfaces::use_case::UseCase;
+use crate::features::stocks_api::application::interfaces::use_cases::use_case::UseCase;
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct GetStocksSummaryParametersDTO {
@@ -26,13 +26,38 @@ pub struct GetStocksSummaryResultDTO {
 
 // // //
 
-pub struct GetStocksSummaryUseCase {}
+pub struct GetStocksSummaryUseCaseImpl {
+    //
+}
+
+pub trait GetStocksSummaryUseCaseConstructor {
+    fn new() -> Self;
+}
 
 #[async_trait]
-impl UseCase<GetStocksSummaryParametersDTO, GetStocksSummaryResultDTO> for GetStocksSummaryUseCase {
+pub trait GetStocksSummaryUseCase:
+    UseCase<GetStocksSummaryParametersDTO, GetStocksSummaryResultDTO>
+{
+}
+
+impl GetStocksSummaryUseCaseConstructor for GetStocksSummaryUseCaseImpl {
+    fn new() -> Self {
+        GetStocksSummaryUseCaseImpl {}
+    }
+}
+
+impl GetStocksSummaryUseCase for GetStocksSummaryUseCaseImpl {}
+
+#[async_trait]
+impl UseCase<GetStocksSummaryParametersDTO, GetStocksSummaryResultDTO>
+    for GetStocksSummaryUseCaseImpl
+{
     async fn execute(
-        _params: GetStocksSummaryParametersDTO,
+        &self,
+        params: GetStocksSummaryParametersDTO,
     ) -> Result<GetStocksSummaryResultDTO, Box<dyn std::error::Error>> {
+        let GetStocksSummaryParametersDTO { user_id: _ } = params;
+
         let result = GetStocksSummaryResultDTO {
             stock_name: "stock".to_string(),
             total_shares: 1,

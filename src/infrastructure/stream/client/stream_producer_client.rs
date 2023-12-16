@@ -12,9 +12,9 @@ pub struct StreamProducerClientSetupParameters {
     pub broker_host: String,
     pub topic: String,
 }
-
+//TODO: rename to ...Client + ...ClientImpl
 #[async_trait]
-pub trait StreamProducerClientTrait {    
+pub trait StreamProducerClientTrait {
     fn setup(params: StreamProducerClientSetupParameters) -> Self;
     async fn produce<T: Serialize + Send>(
         &self,

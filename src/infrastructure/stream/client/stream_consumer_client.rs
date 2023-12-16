@@ -8,14 +8,15 @@ use std::{
 use async_trait::async_trait;
 use rdkafka::{
     self,
-    consumer::{CommitMode, Consumer, DefaultConsumerContext, StreamConsumer},
+    consumer::{self, CommitMode, Consumer, DefaultConsumerContext, StreamConsumer},
     message::BorrowedMessage,
+    types::RDKafkaErrorCode,
     ClientConfig, Message,
 };
 
 //
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct StreamConsumerClientSetupParameters {
     pub broker_host: String,
     pub topic: String,
@@ -26,7 +27,7 @@ pub struct StreamConsumerClientSetupParameters {
 pub trait StreamConsumerClientTrait {
     async fn setup<F, Fut>(params: StreamConsumerClientSetupParameters, handler: F)
     where
-        F: Send + Copy + Sync + 'static + Fn(String) -> Fut,
+        F: Send + Copy + Sync + Fn(String) -> Fut,
         Fut: Future<Output = Result<(), Infallible>> + Send;
 }
 
@@ -38,7 +39,7 @@ pub struct StreamConsumerClient;
 impl StreamConsumerClientTrait for StreamConsumerClient {
     async fn setup<F, Fut>(params: StreamConsumerClientSetupParameters, handler: F)
     where
-        F: Send + Copy + Sync + 'static + Fn(String) -> Fut,
+        F: Send + Copy + Sync + Fn(String) -> Fut,
         Fut: Future<Output = Result<(), Infallible>> + Send,
     {
         let StreamConsumerClientSetupParameters {
@@ -46,17 +47,18 @@ impl StreamConsumerClientTrait for StreamConsumerClient {
             topic,
             optional_group,
         } = params;
-    
+
         let consumer: StreamConsumer = {
             let default_group = "default_consumer_group".to_string();
             let group = &optional_group.clone().unwrap_or(default_group);
 
-            let mut consumer_client_config = ClientConfig::new();            
+            let mut consumer_client_config = ClientConfig::new();
             consumer_client_config.set("bootstrap.servers", &broker_host);
             consumer_client_config.set("group.id", group);
             consumer_client_config.set("enable.partition.eof", "false");
             consumer_client_config.set("enable.auto.commit", "false");
             consumer_client_config.set("session.timeout.ms", "6000");
+            consumer_client_config.set("allow.auto.create.topics", "true");
 
             let consumer = consumer_client_config
                 .create::<StreamConsumer>()
@@ -77,6 +79,23 @@ impl StreamConsumerClientTrait for StreamConsumerClient {
 
                 let is_message_consumed = consumer_result.is_ok();
                 if !is_message_consumed {
+                    {
+                        // According to an issue in rust-rdkafka library, the consumer client is unable to create the topic and will result in this error
+                        const RDKAFKA_CONSUMER_AUTO_CREATE_TOPIC_IGNORABLE_ERROR: RDKafkaErrorCode =
+                            RDKafkaErrorCode::UnknownTopicOrPartition;
+                        // It was recommended to ignore it because the consumer would be able to pick up messages as soon as the topic is created
+                        let message_consumed_error = consumer_result
+                            .as_ref()
+                            .unwrap_err()
+                            .rdkafka_error_code()
+                            .unwrap();
+                        if message_consumed_error
+                            == RDKAFKA_CONSUMER_AUTO_CREATE_TOPIC_IGNORABLE_ERROR
+                        {
+                            continue;
+                        }
+                    }
+
                     println!(
                         "[Kafka Client] Error consuming from topic '{}' -> {}",
                         &topic,
@@ -109,7 +128,7 @@ impl StreamConsumerClientTrait for StreamConsumerClient {
                 payload
             };
 
-            // Handle the consumed message one at the time synchronously
+            // Handle the consumed message one at the time
             let handler_result = handler(consumed_message_payload).await;
 
             let is_handler_successful = handler_result.is_ok();
