@@ -26,10 +26,6 @@ pub struct GetStocksSummaryResultDTO {
 
 // // //
 
-pub struct GetStocksSummaryUseCaseImpl {
-    //
-}
-
 pub trait GetStocksSummaryUseCaseConstructor {
     fn new() -> Self;
 }
@@ -40,13 +36,21 @@ pub trait GetStocksSummaryUseCase:
 {
 }
 
+//  //  //
+
+pub struct GetStocksSummaryUseCaseImpl {
+    //
+}
+
+//  //  //
+
+impl GetStocksSummaryUseCase for GetStocksSummaryUseCaseImpl {}
+
 impl GetStocksSummaryUseCaseConstructor for GetStocksSummaryUseCaseImpl {
     fn new() -> Self {
         GetStocksSummaryUseCaseImpl {}
     }
 }
-
-impl GetStocksSummaryUseCase for GetStocksSummaryUseCaseImpl {}
 
 #[async_trait]
 impl UseCase<GetStocksSummaryParametersDTO, GetStocksSummaryResultDTO>

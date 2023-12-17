@@ -1,4 +1,5 @@
-// It's required to declare the entire module tree, optioned to do it at the feature level
+// It's required to declare the entire module tree,
+// This is being done at every feature/module level to be easily used in the main file
 
 pub mod adapters {
     pub mod entrypoints {
@@ -13,7 +14,7 @@ pub mod adapters {
         pub mod consumers {
             pub mod stock_consumer;
         }
-        pub mod model {
+        pub mod models {
             pub mod api_response;
         }
     }

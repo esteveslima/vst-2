@@ -6,16 +6,19 @@ use rdkafka::{
 use serde::Serialize;
 use std::time::Duration;
 
-//
-
-pub struct StreamProducerClientSetupParameters {
+pub struct StreamProducerClientBuildParameters {
     pub broker_host: String,
     pub topic: String,
 }
-//TODO: rename to ...Client + ...ClientImpl
+
+//  //  //
+
+pub trait StreamProducerClientConstructor {
+    fn new(params: StreamProducerClientBuildParameters) -> Self;
+}
+
 #[async_trait]
-pub trait StreamProducerClientTrait {
-    fn setup(params: StreamProducerClientSetupParameters) -> Self;
+pub trait StreamProducerClient: Send + Sync {
     async fn produce<T: Serialize + Send>(
         &self,
         payload: T,
@@ -23,16 +26,17 @@ pub trait StreamProducerClientTrait {
     ) -> Result<(), Box<dyn std::error::Error>>;
 }
 
-pub struct StreamProducerClient {
+//  //  //
+
+pub struct StreamProducerClientImpl {
     producer: FutureProducer,
-    params: StreamProducerClientSetupParameters,
+    params: StreamProducerClientBuildParameters,
 }
 
-//
+//  //  //
 
-#[async_trait]
-impl StreamProducerClientTrait for StreamProducerClient {
-    fn setup(params: StreamProducerClientSetupParameters) -> Self {
+impl StreamProducerClientConstructor for StreamProducerClientImpl {
+    fn new(params: StreamProducerClientBuildParameters) -> Self {
         let mut producer_client_config = ClientConfig::new();
         producer_client_config.set("bootstrap.servers", &params.broker_host);
         producer_client_config.set("allow.auto.create.topics", "true");
@@ -41,9 +45,12 @@ impl StreamProducerClientTrait for StreamProducerClient {
             .create::<FutureProducer>()
             .expect("Failed to connect producer to kafka");
 
-        return StreamProducerClient { producer, params };
+        return StreamProducerClientImpl { producer, params };
     }
+}
 
+#[async_trait]
+impl StreamProducerClient for StreamProducerClientImpl {
     async fn produce<T: Serialize + Send>(
         &self,
         payload: T,

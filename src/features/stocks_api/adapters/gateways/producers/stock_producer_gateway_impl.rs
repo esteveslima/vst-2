@@ -5,20 +5,21 @@ use crate::{
         PurchaseStockEventParametersDTO, SellStockEventParametersDTO, StockProducerGateway,
         StockProducerGatewayConstructor,
     },
-    infrastructure::stream::client::stream_producer_client::{
-        StreamProducerClient, StreamProducerClientSetupParameters, StreamProducerClientTrait,
+    infrastructure::clients::stream::stream_producer_client::{
+        StreamProducerClient, StreamProducerClientBuildParameters, StreamProducerClientConstructor,
+        StreamProducerClientImpl,
     },
 };
 
 pub struct StockProducerGatewayImpl {
-    stream_producer_client: StreamProducerClient,
+    stream_producer_client: StreamProducerClientImpl,
 }
 
-impl StockProducerGatewayConstructor for StockProducerGatewayImpl {
+impl<'a> StockProducerGatewayConstructor for StockProducerGatewayImpl {
     fn new() -> Self {
         StockProducerGatewayImpl {
-            stream_producer_client: StreamProducerClient::setup(
-                StreamProducerClientSetupParameters {
+            stream_producer_client: StreamProducerClientConstructor::new(
+                StreamProducerClientBuildParameters {
                     broker_host: std::env::var("STOCK_KAFKA_BROKER_HOST").unwrap(),
                     topic: std::env::var("STOCK_KAFKA_TOPIC").unwrap(),
                 },

@@ -17,13 +17,16 @@ pub trait StockUseCasesBuilder<'a> {
     fn build(gateways: &'a StockGateways) -> StockUseCases<'a>;
 }
 
+//  //  //
+
 pub struct StockUseCases<'a> {
-    // TODO: how to make these only references(&'a)? compiler doesn't infer the '...Impl' struct directly into the trait it's implementing
     pub purchase_stock_use_case: Box<dyn PurchaseStockUseCase + 'a>,
     pub sell_stock_use_case: Box<dyn SellStockUseCase + 'a>,
     pub get_stocks_summary_use_case: Box<dyn GetStocksSummaryUseCase + 'a>,
     pub test_consume_use_case: Box<dyn TestConsumeUseCase + 'a>,
 }
+
+//  //  //
 
 impl<'a> StockUseCasesBuilder<'a> for StockUseCases<'a> {
     fn build(gateways: &'a StockGateways) -> StockUseCases<'a> {

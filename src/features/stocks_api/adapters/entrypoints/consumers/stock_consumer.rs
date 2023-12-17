@@ -5,10 +5,6 @@ use crate::features::stocks_api::application::use_cases::test_consume_use_case::
     TestConsumeUseCase, TestConsumeUseCaseParametersDTO,
 };
 
-pub struct StockConsumerImpl<'a> {
-    test_consume_use_case: &'a Box<dyn TestConsumeUseCase + 'a>,
-}
-
 pub trait StockConsumerConstructor<'a> {
     fn new(test_consume_use_case: &'a Box<dyn TestConsumeUseCase + 'a>) -> Self;
 }
@@ -17,6 +13,14 @@ pub trait StockConsumerConstructor<'a> {
 pub trait StockConsumer: Sync {
     async fn handle_consume_test_operation(&self, payload: String) -> Result<(), Infallible>;
 }
+
+//  //  //
+
+pub struct StockConsumerImpl<'a> {
+    test_consume_use_case: &'a Box<dyn TestConsumeUseCase + 'a>,
+}
+
+//  //  //
 
 impl<'a> StockConsumerConstructor<'a> for StockConsumerImpl<'a> {
     fn new(test_consume_use_case: &'a Box<dyn TestConsumeUseCase + 'a>) -> Self {

@@ -1,5 +1,5 @@
-use crate::infrastructure::stream::client::stream_consumer_client::{
-    StreamConsumerClient, StreamConsumerClientSetupParameters, StreamConsumerClientTrait,
+use crate::infrastructure::clients::stream::stream_consumer_client::{
+    StreamConsumerClient, StreamConsumerClientImpl, StreamConsumerClientListenParameters,
 };
 
 use crate::features::stocks_api::adapters::entrypoints::consumers::stock_consumer::StockConsumer;
@@ -7,8 +7,8 @@ use crate::features::stocks_api::adapters::entrypoints::consumers::stock_consume
 pub async fn setup_consumer_router<'a: 'static>(
     stock_consumer: &'a Box<dyn StockConsumer + 'a>,
 ) -> () {
-    let stock_consumer_router = StreamConsumerClient::setup(
-        StreamConsumerClientSetupParameters {
+    let stock_consumer_router = StreamConsumerClientImpl::listen(
+        StreamConsumerClientListenParameters {
             broker_host: std::env::var("STOCK_KAFKA_BROKER_HOST").unwrap(),
             topic: std::env::var("STOCK_KAFKA_TOPIC").unwrap(),
             optional_group: None,

@@ -11,10 +11,14 @@ pub trait StockEntrypointsBuilder<'a> {
     fn build(use_cases: &'a StockUseCases) -> StockEntrypoints<'a>;
 }
 
+//  //  //
+
 pub struct StockEntrypoints<'a> {
     pub stock_controller: Box<dyn StockController + 'a>,
     pub stock_consumer: Box<dyn StockConsumer + 'a>,
 }
+
+//  //  //
 
 impl<'a> StockEntrypointsBuilder<'a> for StockEntrypoints<'a> {
     fn build(use_cases: &'a StockUseCases) -> StockEntrypoints<'a> {

@@ -3,7 +3,13 @@ use std::convert::Infallible;
 use validator::Validate;
 use warp::reply::Reply;
 
-use crate::features::stocks_api::adapters::entrypoints::model::api_response::APIResponse;
+use super::dtos::get_stocks_summary_rest_dto::GetStocksSummaryRestResponseDTO;
+use super::dtos::purchase_stock_rest_dto::{
+    PurchaseStockRestRequestBodyDTO, PurchaseStockRestResponseDTO,
+};
+use super::dtos::sell_stock_rest_dto::SellStockRestRequestBodyDTO;
+use super::dtos::sell_stock_rest_dto::SellStockRestResponseDTO;
+use crate::features::stocks_api::adapters::entrypoints::models::api_response::APIResponse;
 use crate::features::stocks_api::application::use_cases::get_stocks_summary_use_case::{
     GetStocksSummaryParametersDTO, GetStocksSummaryUseCase,
 };
@@ -13,25 +19,6 @@ use crate::features::stocks_api::application::use_cases::purchase_stock_use_case
 use crate::features::stocks_api::application::use_cases::sell_stock_use_case::{
     SellStockParametersDTO, SellStockParametersPayloadDTO, SellStockUseCase,
 };
-
-use super::dtos::get_stocks_summary_rest_dto::GetStocksSummaryRestResponseDTO;
-use super::dtos::purchase_stock_rest_dto::{
-    PurchaseStockRestRequestBodyDTO, PurchaseStockRestResponseDTO,
-};
-use super::dtos::sell_stock_rest_dto::SellStockRestRequestBodyDTO;
-use super::dtos::sell_stock_rest_dto::SellStockRestResponseDTO;
-
-// pub struct StockController {
-//     pub purchase_stock_use_case: Box<dyn PurchaseStockUseCase>,
-//     pub sell_stock_use_case: Box<dyn SellStockUseCase>,
-//     pub get_stocks_summary_use_case: Box<dyn GetStocksSummaryUseCase>,
-// }
-
-pub struct StockControllerImpl<'a> {
-    purchase_stock_use_case: &'a Box<dyn PurchaseStockUseCase + 'a>,
-    sell_stock_use_case: &'a Box<dyn SellStockUseCase + 'a>,
-    get_stocks_summary_use_case: &'a Box<dyn GetStocksSummaryUseCase + 'a>,
-}
 
 pub trait StockControllerConstructor<'a> {
     fn new(
@@ -54,6 +41,16 @@ pub trait StockController: Sync {
     async fn get_stocks_summary(&self) -> Result<Box<dyn Reply>, Infallible>;
 }
 
+//  //  //
+
+pub struct StockControllerImpl<'a> {
+    purchase_stock_use_case: &'a Box<dyn PurchaseStockUseCase + 'a>,
+    sell_stock_use_case: &'a Box<dyn SellStockUseCase + 'a>,
+    get_stocks_summary_use_case: &'a Box<dyn GetStocksSummaryUseCase + 'a>,
+}
+
+//  //  //
+
 impl<'a> StockControllerConstructor<'a> for StockControllerImpl<'a> {
     fn new(
         get_stocks_summary_use_case: &'a Box<dyn GetStocksSummaryUseCase + 'a>,
@@ -68,7 +65,6 @@ impl<'a> StockControllerConstructor<'a> for StockControllerImpl<'a> {
     }
 }
 
-// impl StockController {
 #[async_trait]
 impl<'a> StockController for StockControllerImpl<'a> {
     async fn purchase_stock(

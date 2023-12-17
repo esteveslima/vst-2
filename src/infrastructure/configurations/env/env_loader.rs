@@ -1,6 +1,6 @@
 use dotenv;
 
-pub fn setup_env_config() {
+pub fn load_env() {
     let path = "assets/environment/.env";
     let env_setup_result = dotenv::from_path(path);
 

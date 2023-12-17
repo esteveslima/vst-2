@@ -16,10 +16,6 @@ pub struct TestConsumeUseCaseResultDTO {
 
 // // //
 
-pub struct TestConsumeUseCaseImpl<'a> {
-    _stock_producer_gateway: &'a Box<dyn StockProducerGateway + 'a>,
-}
-
 pub trait TestConsumeUseCaseConstructor<'a> {
     fn new(_stock_producer_gateway: &'a Box<dyn StockProducerGateway + 'a>) -> Self;
 }
@@ -30,6 +26,16 @@ pub trait TestConsumeUseCase:
 {
 }
 
+//  //  //
+
+pub struct TestConsumeUseCaseImpl<'a> {
+    _stock_producer_gateway: &'a Box<dyn StockProducerGateway + 'a>,
+}
+
+//  //  //
+
+impl<'a> TestConsumeUseCase for TestConsumeUseCaseImpl<'a> {}
+
 impl<'a> TestConsumeUseCaseConstructor<'a> for TestConsumeUseCaseImpl<'a> {
     fn new(_stock_producer_gateway: &'a Box<dyn StockProducerGateway + 'a>) -> Self {
         TestConsumeUseCaseImpl {
@@ -37,8 +43,6 @@ impl<'a> TestConsumeUseCaseConstructor<'a> for TestConsumeUseCaseImpl<'a> {
         }
     }
 }
-
-impl<'a> TestConsumeUseCase for TestConsumeUseCaseImpl<'a> {}
 
 #[async_trait]
 impl<'a> UseCase<TestConsumeUseCaseParametersDTO, TestConsumeUseCaseResultDTO>

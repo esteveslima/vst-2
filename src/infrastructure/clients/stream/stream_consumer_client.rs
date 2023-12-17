@@ -14,35 +14,37 @@ use rdkafka::{
     ClientConfig, Message,
 };
 
-//
-
 #[derive(Clone, Debug)]
-pub struct StreamConsumerClientSetupParameters {
+pub struct StreamConsumerClientListenParameters {
     pub broker_host: String,
     pub topic: String,
     pub optional_group: Option<String>,
 }
 
+//  //  //
+
 #[async_trait]
-pub trait StreamConsumerClientTrait {
-    async fn setup<F, Fut>(params: StreamConsumerClientSetupParameters, handler: F)
+pub trait StreamConsumerClient {
+    async fn listen<F, Fut>(params: StreamConsumerClientListenParameters, handler: F)
     where
         F: Send + Copy + Sync + Fn(String) -> Fut,
         Fut: Future<Output = Result<(), Infallible>> + Send;
 }
 
-pub struct StreamConsumerClient;
+//  //  //
 
-//
+pub struct StreamConsumerClientImpl;
+
+//  //  //
 
 #[async_trait]
-impl StreamConsumerClientTrait for StreamConsumerClient {
-    async fn setup<F, Fut>(params: StreamConsumerClientSetupParameters, handler: F)
+impl StreamConsumerClient for StreamConsumerClientImpl {
+    async fn listen<F, Fut>(params: StreamConsumerClientListenParameters, handler: F)
     where
         F: Send + Copy + Sync + Fn(String) -> Fut,
         Fut: Future<Output = Result<(), Infallible>> + Send,
     {
-        let StreamConsumerClientSetupParameters {
+        let StreamConsumerClientListenParameters {
             broker_host,
             topic,
             optional_group,
@@ -149,7 +151,7 @@ impl StreamConsumerClientTrait for StreamConsumerClient {
     // // TODO: Handle the consumed message in parallel, asynchronously
     // // P.S.1: There might be problems moving references into tokio task
     // // P.S.2: Commiting messages asynchronously may lead into problems with kafka offset order
-    // async fn setup_async<F, Fut>(params: StreamConsumerClientSetupParameters, handler: F)
+    // async fn setup_async<F, Fut>(params: StreamConsumerClientListenParameters, handler: F)
     // where
     //     F: Send + Copy + Sync + 'static + Fn(String) -> Fut,
     //     Fut: Future<Output = Result<(), Infallible>> + Send,

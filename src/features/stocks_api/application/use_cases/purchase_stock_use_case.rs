@@ -30,10 +30,6 @@ pub struct PurchaseStockResultDTO {
 
 // // //
 
-pub struct PurchaseStockUseCaseImpl<'a> {
-    stock_producer_gateway: &'a Box<dyn StockProducerGateway + 'a>,
-}
-
 pub trait PurchaseStockUseCaseConstructor<'a> {
     fn new(stock_producer_gateway: &'a Box<dyn StockProducerGateway + 'a>) -> Self;
 }
@@ -44,6 +40,16 @@ pub trait PurchaseStockUseCase:
 {
 }
 
+//  //  //
+
+pub struct PurchaseStockUseCaseImpl<'a> {
+    stock_producer_gateway: &'a Box<dyn StockProducerGateway + 'a>,
+}
+
+//  //  //
+
+impl<'a> PurchaseStockUseCase for PurchaseStockUseCaseImpl<'a> {}
+
 impl<'a> PurchaseStockUseCaseConstructor<'a> for PurchaseStockUseCaseImpl<'a> {
     fn new(stock_producer_gateway: &'a Box<dyn StockProducerGateway + 'a>) -> Self {
         PurchaseStockUseCaseImpl {
@@ -51,8 +57,6 @@ impl<'a> PurchaseStockUseCaseConstructor<'a> for PurchaseStockUseCaseImpl<'a> {
         }
     }
 }
-
-impl<'a> PurchaseStockUseCase for PurchaseStockUseCaseImpl<'a> {}
 
 #[async_trait]
 impl<'a> UseCase<PurchaseStockParametersDTO, PurchaseStockResultDTO>
