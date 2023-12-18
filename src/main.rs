@@ -1,7 +1,7 @@
-use features::stocks_api::infrastructure::builders::{
-    stock_entrypoints_builder::{StockEntrypoints, StockEntrypointsBuilder},
-    stock_gateways_builder::{StockGateways, StockGatewaysBuilder},
-    stock_use_cases_builder::{StockUseCases, StockUseCasesBuilder},
+use features::stocks_api::infrastructure::factories::{
+    stock_entrypoints_factory::{StockEntrypoints, StockEntrypointsFactory},
+    stock_gateways_factory::{StockGateways, StockGatewaysFactory},
+    stock_use_cases_factory::{StockUseCases, StockUseCasesFactory},
 };
 use infrastructure::{
     configurations::env::env_loader,

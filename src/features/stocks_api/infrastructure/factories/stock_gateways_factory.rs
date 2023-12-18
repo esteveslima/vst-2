@@ -5,7 +5,7 @@ use crate::features::stocks_api::{
     },
 };
 
-pub trait StockGatewaysBuilder<'a> {
+pub trait StockGatewaysFactory<'a> {
     fn build() -> StockGateways<'a>;
 }
 
@@ -17,7 +17,7 @@ pub struct StockGateways<'a> {
 
 //  //  //
 
-impl<'a> StockGatewaysBuilder<'a> for StockGateways<'a> {
+impl<'a> StockGatewaysFactory<'a> for StockGateways<'a> {
     fn build() -> StockGateways<'a> {
         StockGateways {
             stock_producer_gateway: Box::new(StockProducerGatewayImpl::new()),

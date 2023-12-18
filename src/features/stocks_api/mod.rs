@@ -43,10 +43,10 @@ pub mod application {
 }
 
 pub mod infrastructure {
-    pub mod builders {
-        pub mod stock_entrypoints_builder;
-        pub mod stock_gateways_builder;
-        pub mod stock_use_cases_builder;
+    pub mod factories {
+        pub mod stock_entrypoints_factory;
+        pub mod stock_gateways_factory;
+        pub mod stock_use_cases_factory;
     }
     pub mod routers {
         pub mod stock_consumer_router;

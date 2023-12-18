@@ -11,9 +11,9 @@ use crate::features::stocks_api::application::use_cases::{
     },
 };
 
-use super::stock_gateways_builder::StockGateways;
+use super::stock_gateways_factory::StockGateways;
 
-pub trait StockUseCasesBuilder<'a> {
+pub trait StockUseCasesFactory<'a> {
     fn build(gateways: &'a StockGateways) -> StockUseCases<'a>;
 }
 
@@ -28,7 +28,7 @@ pub struct StockUseCases<'a> {
 
 //  //  //
 
-impl<'a> StockUseCasesBuilder<'a> for StockUseCases<'a> {
+impl<'a> StockUseCasesFactory<'a> for StockUseCases<'a> {
     fn build(gateways: &'a StockGateways) -> StockUseCases<'a> {
         let StockGateways {
             stock_producer_gateway,
