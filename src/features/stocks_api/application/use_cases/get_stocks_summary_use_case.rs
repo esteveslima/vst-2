@@ -3,7 +3,7 @@ use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use std;
 
-use crate::features::stocks_api::application::interfaces::use_cases::use_case::UseCase;
+use crate::application::interfaces::use_case::UseCase;
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct GetStocksSummaryParametersDTO {

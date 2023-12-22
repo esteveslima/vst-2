@@ -27,7 +27,7 @@ pub struct StreamConsumerClientListenParameters {
 pub trait StreamConsumerClient {
     async fn listen<F, Fut>(params: StreamConsumerClientListenParameters, handler: F)
     where
-        F: Send + Copy + Sync + Fn(String) -> Fut,
+        F: Send + Copy + Sync + Fn(Option<String>, String) -> Fut,
         Fut: Future<Output = Result<(), Infallible>> + Send;
 }
 
@@ -41,7 +41,7 @@ pub struct StreamConsumerClientImpl;
 impl StreamConsumerClient for StreamConsumerClientImpl {
     async fn listen<F, Fut>(params: StreamConsumerClientListenParameters, handler: F)
     where
-        F: Send + Copy + Sync + Fn(String) -> Fut,
+        F: Send + Copy + Sync + Fn(Option<String>, String) -> Fut,
         Fut: Future<Output = Result<(), Infallible>> + Send,
     {
         let StreamConsumerClientListenParameters {
@@ -75,7 +75,7 @@ impl StreamConsumerClient for StreamConsumerClientImpl {
             consumer
         };
 
-        loop {
+        'consumer_loop: loop {
             let consumed_message: BorrowedMessage<'_> = {
                 let consumer_result = consumer.recv().await;
 
@@ -111,19 +111,36 @@ impl StreamConsumerClient for StreamConsumerClientImpl {
                 message
             };
 
+            let consumed_message_key: Option<String> = 'block: {
+                let key_bytes = &consumed_message.key();
+                if key_bytes.is_none() {
+                    break 'block None;
+                }
+
+                let parsed_key_result = String::from_utf8(key_bytes.unwrap().to_vec());
+                if parsed_key_result.is_err() {
+                    break 'block None;
+                }
+
+                let key_optional_string = parsed_key_result.unwrap();
+                Some(key_optional_string)
+            };
+
             let consumed_message_payload: String = {
                 let payload_consumed_result = &consumed_message.payload_view::<str>();
 
                 let has_payload = payload_consumed_result.is_some();
                 if !has_payload {
-                    println!("[Kafka Client] No message payload")
+                    println!("[Kafka Client] No message payload");
+                    continue 'consumer_loop;
                 }
 
                 let payload_result = &payload_consumed_result.unwrap();
 
                 let is_payload_valid = &payload_result.is_ok();
                 if !is_payload_valid {
-                    println!("[Kafka Client] Invalid message payload")
+                    println!("[Kafka Client] Invalid message payload");
+                    continue 'consumer_loop;
                 }
 
                 let payload = payload_result.unwrap().to_string();
@@ -132,7 +149,7 @@ impl StreamConsumerClient for StreamConsumerClientImpl {
             };
 
             // Handle the consumed message one at the time
-            let handler_result = handler(consumed_message_payload).await;
+            let handler_result = handler(consumed_message_key, consumed_message_payload).await;
 
             let is_handler_successful = handler_result.is_ok();
             if !is_handler_successful {

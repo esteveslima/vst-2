@@ -1,11 +1,11 @@
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-use crate::features::stocks_api::application::interfaces::{
-    gateways::stock_producer_gateway::{
+use crate::{
+    application::interfaces::use_case::UseCase,
+    features::stocks_api::application::interfaces::gateways::stock_producer_gateway::{
         OrderPayloadDTO, ProducePurchaseStockOrderParametersDTO, StockProducerGateway,
     },
-    use_cases::use_case::UseCase,
 };
 
 #[derive(Deserialize, Serialize, Debug)]
