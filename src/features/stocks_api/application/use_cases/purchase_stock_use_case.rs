@@ -2,7 +2,9 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 use crate::features::stocks_api::application::interfaces::{
-    gateways::stock_producer_gateway::{PurchaseStockEventParametersDTO, StockProducerGateway},
+    gateways::stock_producer_gateway::{
+        OrderPayloadDTO, ProducePurchaseStockOrderParametersDTO, StockProducerGateway,
+    },
     use_cases::use_case::UseCase,
 };
 
@@ -67,15 +69,18 @@ impl<'a> UseCase<PurchaseStockParametersDTO, PurchaseStockResultDTO>
         params: PurchaseStockParametersDTO,
     ) -> Result<PurchaseStockResultDTO, Box<dyn std::error::Error>> {
         let PurchaseStockParametersDTO {
-            user_id: _,
+            user_id,
             payload: PurchaseStockParametersPayloadDTO { stock, shares },
         } = params;
 
         let _produce_result = self
             .stock_producer_gateway
-            .produce_event_purchase_stock(PurchaseStockEventParametersDTO {
-                shares: shares.clone(),
-                stock: stock.clone(),
+            .produce_purchase_stock_order(ProducePurchaseStockOrderParametersDTO {
+                user_id: user_id.to_string(),
+                payload: OrderPayloadDTO {
+                    shares: shares.clone(),
+                    stock: stock.clone(),
+                },
             })
             .await;
 

@@ -6,6 +6,7 @@ use rdkafka::{
 use serde::Serialize;
 use std::time::Duration;
 
+//TODO: refactor to have producer + consumer in the same client?
 pub struct StreamProducerClientBuildParameters {
     pub broker_host: String,
     pub topic: String,

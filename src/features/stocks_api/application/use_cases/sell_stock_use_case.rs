@@ -3,7 +3,9 @@ use serde::{Deserialize, Serialize};
 use std;
 
 use crate::features::stocks_api::application::interfaces::{
-    gateways::stock_producer_gateway::{SellStockEventParametersDTO, StockProducerGateway},
+    gateways::stock_producer_gateway::{
+        OrderPayloadDTO, ProduceSellStockOrderParametersDTO, StockProducerGateway,
+    },
     use_cases::use_case::UseCase,
 };
 
@@ -65,7 +67,7 @@ impl<'a> UseCase<SellStockParametersDTO, SellStockResultDTO> for SellStockUseCas
         tokio::time::sleep(std::time::Duration::from_secs(5)).await;
 
         let SellStockParametersDTO {
-            user_id: _,
+            user_id,
             payload: SellStockParametersPayloadDTO { stock, shares },
         } = params;
 
@@ -78,9 +80,12 @@ impl<'a> UseCase<SellStockParametersDTO, SellStockResultDTO> for SellStockUseCas
 
         let _produce_result = self
             .stock_producer_gateway
-            .produce_event_sell_stock(SellStockEventParametersDTO {
-                shares: shares.clone(),
-                stock: stock.clone(),
+            .produce_sell_stock_order(ProduceSellStockOrderParametersDTO {
+                user_id: user_id.to_string(),
+                payload: OrderPayloadDTO {
+                    shares: shares.clone(),
+                    stock: stock.clone(),
+                },
             })
             .await;
 

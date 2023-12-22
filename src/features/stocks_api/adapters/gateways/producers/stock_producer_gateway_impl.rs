@@ -1,9 +1,10 @@
 use async_trait::async_trait;
+use serde::Serialize;
 
 use crate::{
     features::stocks_api::application::interfaces::gateways::stock_producer_gateway::{
-        PurchaseStockEventParametersDTO, SellStockEventParametersDTO, StockProducerGateway,
-        StockProducerGatewayConstructor,
+        OrderPayloadDTO, ProducePurchaseStockOrderParametersDTO,
+        ProduceSellStockOrderParametersDTO, StockProducerGateway, StockProducerGatewayConstructor,
     },
     infrastructure::clients::stream::stream_producer_client::{
         StreamProducerClient, StreamProducerClientBuildParameters, StreamProducerClientConstructor,
@@ -11,17 +12,35 @@ use crate::{
     },
 };
 
-pub struct StockProducerGatewayImpl {
-    stream_producer_client: StreamProducerClientImpl,
+#[derive(Serialize)]
+#[serde(rename_all = "UPPERCASE")]
+enum OrderOperation {
+    PURCHASE,
+    SELL,
 }
+
+#[derive(Serialize)]
+struct StockOrder {
+    operation: OrderOperation,
+    stock: String,
+    shares: usize,
+}
+
+//  //  //
+
+pub struct StockProducerGatewayImpl {
+    stock_order_producer_client: StreamProducerClientImpl,
+}
+
+//  //  //
 
 impl<'a> StockProducerGatewayConstructor for StockProducerGatewayImpl {
     fn new() -> Self {
         StockProducerGatewayImpl {
-            stream_producer_client: StreamProducerClientConstructor::new(
+            stock_order_producer_client: StreamProducerClientConstructor::new(
                 StreamProducerClientBuildParameters {
-                    broker_host: std::env::var("STOCK_KAFKA_BROKER_HOST").unwrap(),
-                    topic: std::env::var("STOCK_KAFKA_TOPIC").unwrap(),
+                    broker_host: std::env::var("KAFKA_BROKER_HOST").unwrap(),
+                    topic: std::env::var("KAFKA_TOPIC_STOCK_ORDER").unwrap(),
                 },
             ),
         }
@@ -30,20 +49,46 @@ impl<'a> StockProducerGatewayConstructor for StockProducerGatewayImpl {
 
 #[async_trait]
 impl StockProducerGateway for StockProducerGatewayImpl {
-    async fn produce_event_purchase_stock(
+    async fn produce_purchase_stock_order(
         &self,
-        params: PurchaseStockEventParametersDTO,
+        params: ProducePurchaseStockOrderParametersDTO,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        let key = None;
-        self.stream_producer_client.produce(params, key).await?;
+        let ProducePurchaseStockOrderParametersDTO {
+            user_id,
+            payload: OrderPayloadDTO { shares, stock },
+        } = params;
+
+        let key = Some(user_id);
+        let purchase_order = StockOrder {
+            operation: OrderOperation::PURCHASE,
+            shares,
+            stock,
+        };
+
+        self.stock_order_producer_client
+            .produce(purchase_order, key)
+            .await?; //TODO: create custom errors(also, look into anyhow)
         Ok(())
     }
-    async fn produce_event_sell_stock(
+    async fn produce_sell_stock_order(
         &self,
-        params: SellStockEventParametersDTO,
+        params: ProduceSellStockOrderParametersDTO,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        let key = None;
-        self.stream_producer_client.produce(params, key).await?;
+        let ProduceSellStockOrderParametersDTO {
+            user_id,
+            payload: OrderPayloadDTO { shares, stock },
+        } = params;
+
+        let key = Some(user_id);
+        let sell_order = StockOrder {
+            operation: OrderOperation::SELL,
+            shares,
+            stock,
+        };
+
+        self.stock_order_producer_client
+            .produce(sell_order, key)
+            .await?;
         Ok(())
     }
 }

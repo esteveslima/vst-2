@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use std;
 
 use crate::features::stocks_api::application::interfaces::{
-    gateways::stock_producer_gateway::{SellStockEventParametersDTO, StockProducerGateway},
+    gateways::stock_producer_gateway::StockProducerGateway,
     use_cases::use_case::UseCase,
 };
 
@@ -55,16 +55,6 @@ impl<'a> UseCase<TestConsumeUseCaseParametersDTO, TestConsumeUseCaseResultDTO>
         let TestConsumeUseCaseParametersDTO { data } = params;
         tokio::time::sleep(std::time::Duration::from_secs(5)).await;
 
-        let _produce_params = SellStockEventParametersDTO {
-            shares: 1,
-            stock: data,
-        };
-
-        // self._stock_producer_gateway
-        // .produce_event_sell_stock(produce_params).await?;
-
-        Ok(TestConsumeUseCaseResultDTO {
-            output: "output".to_string(),
-        })
+        Ok(TestConsumeUseCaseResultDTO { output: data })
     }
 }

@@ -33,13 +33,13 @@ impl<'a> StockConsumerConstructor<'a> for StockConsumerImpl<'a> {
 #[async_trait]
 impl<'a> StockConsumer for StockConsumerImpl<'a> {
     async fn handle_consume_test_operation(&self, payload: String) -> Result<(), Infallible> {
+        println!("{}", payload);
+
         let params = TestConsumeUseCaseParametersDTO {
             data: "".to_string(),
         };
 
         let _use_case_result = self.test_consume_use_case.execute(params).await;
-
-        println!("{}", payload);
 
         Ok(())
     }

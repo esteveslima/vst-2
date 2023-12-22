@@ -94,7 +94,7 @@ impl StreamConsumerClient for StreamConsumerClientImpl {
                         if message_consumed_error
                             == RDKAFKA_CONSUMER_AUTO_CREATE_TOPIC_IGNORABLE_ERROR
                         {
-                            println!("Ignoring known error: {}", message_consumed_error);
+                            println!("Ignoring known error [{}], Consumer will pickup events after the topic is created", message_consumed_error);
                             continue;
                         }
                     }
