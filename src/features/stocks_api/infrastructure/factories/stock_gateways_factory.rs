@@ -1,6 +1,6 @@
 use crate::features::stocks_api::{
     adapters::gateways::producers::stock_producer_gateway_impl::StockProducerGatewayImpl,
-    application::interfaces::gateways::stock_producer_gateway::{
+    application::interfaces::gateways::producers::stock_producer_gateway::{
         StockProducerGateway, StockProducerGatewayConstructor,
     },
 };

@@ -25,7 +25,9 @@ pub mod adapters {
 pub mod application {
     pub mod interfaces {
         pub mod gateways {
-            pub mod stock_producer_gateway;
+            pub mod producers {
+                pub mod stock_producer_gateway;
+            }
         }
     }
     pub mod use_cases {

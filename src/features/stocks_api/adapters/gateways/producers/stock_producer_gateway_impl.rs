@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use serde::Serialize;
 
 use crate::{
-    features::stocks_api::application::interfaces::gateways::stock_producer_gateway::{
+    features::stocks_api::application::interfaces::gateways::producers::stock_producer_gateway::{
         OrderPayloadDTO, ProducePurchaseStockOrderParametersDTO,
         ProduceSellStockOrderParametersDTO, StockProducerGateway, StockProducerGatewayConstructor,
     },
