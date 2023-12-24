@@ -58,3 +58,14 @@ async fn main() {
 
     tokio::join!(web_server_runner, stream_consumer_runner);
 }
+
+// TODOS:
+//V 1 - make the api produce stock orders
+//V 1.1 - add keys by user id to ensure ordering
+// 2 - make a worker module to handle the orders and generate the transactions   -> fix stock names to keep pattern
+// 3 - add materialize to docker environment
+// 4 - create a client to connect to materialize and add materialized views
+// 5 - maybe refactor to have the kafka data as entities
+// 6 - create queries to fetch data from materialized the views
+// 7 - search for how to create cron jobs
+// 8 - implement cron jobs to watch stocks fluctuations and store data for future queries

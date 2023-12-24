@@ -80,7 +80,7 @@ impl<'a> StockController for StockControllerImpl<'a> {
                 )))
             }
         }
-        let mock_user_id = 0;
+        let mock_user_id = 0.to_string();
         let params = PurchaseStockParametersDTO {
             user_id: mock_user_id,
             payload: PurchaseStockParametersPayloadDTO {
@@ -129,7 +129,7 @@ impl<'a> StockController for StockControllerImpl<'a> {
                 )))
             }
         }
-        let mock_user_id = 0;
+        let mock_user_id = 0.to_string();
         let params = SellStockParametersDTO {
             user_id: mock_user_id,
             payload: SellStockParametersPayloadDTO {
@@ -168,7 +168,7 @@ impl<'a> StockController for StockControllerImpl<'a> {
     async fn get_stocks_summary(&self) -> Result<Box<dyn Reply>, Infallible> {
         let mock_user_id = 0;
         let params = GetStocksSummaryParametersDTO {
-            user_id: mock_user_id,
+            user_id: mock_user_id.to_string(),
         };
 
         let use_case_result = self.get_stocks_summary_use_case.execute(params).await;

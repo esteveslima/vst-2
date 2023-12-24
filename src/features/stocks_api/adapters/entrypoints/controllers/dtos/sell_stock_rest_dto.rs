@@ -14,7 +14,7 @@ pub struct SellStockRestRequestBodyDTO {
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct SellStockRestResponseDTO {
-    pub id: usize,
+    pub id: String,
     pub stock: String,
     pub shares: usize,
     pub price: f32,

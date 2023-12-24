@@ -1,5 +1,5 @@
 use crate::features::stocks_api::adapters::entrypoints::controllers::stock_controller::{
-        StockController, StockControllerConstructor, StockControllerImpl,
+    StockController, StockControllerConstructor, StockControllerImpl,
 };
 
 use super::stock_use_cases_factory::StockUseCases;

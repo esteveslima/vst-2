@@ -11,6 +11,12 @@ pub mod adapters {
         }
     }
     pub mod gateways {
+        pub mod http {
+            pub mod dtos {
+                pub mod nasdaq_api_fetch_stock_data_dto;
+            }
+            pub mod stock_market_http_api_gateway_impl;
+        }
         pub mod producers {
             pub mod stock_order_transaction_producer_gateway_impl;
         }
@@ -20,6 +26,9 @@ pub mod adapters {
 pub mod application {
     pub mod interfaces {
         pub mod gateways {
+            pub mod http {
+                pub mod stock_market_http_api_gateway;
+            }
             pub mod producers {
                 pub mod stock_order_transaction_producer_gateway;
             }

@@ -1,12 +1,37 @@
+use std::str::FromStr;
+
 use async_trait::async_trait;
-use std;
+use serde::{Deserialize, Serialize};
 
 use crate::{
-    features::transactions_worker::application::interfaces::gateways::producers::stock_order_transaction_producer_gateway::{ProduceStockOrderTransactionParametersDTO, StockOrderTransactionPayloadDTO, StockOrderTransactionProducerGateway},
-    application::interfaces::use_case::UseCase
+    application::interfaces::use_case::UseCase,
+    features::transactions_worker::application::interfaces::gateways::{
+        http::stock_market_http_api_gateway::{
+            PurchaseStockStockMarketGatewayParametersDTO, SellStockStockMarketGatewayParametersDTO,
+            StockMarketHttpAPIGateway,
+        }, producers::stock_order_transaction_producer_gateway::{StockOrderTransactionProducerGateway, ProduceStockOrderTransactionParametersDTO, ProduceStockOrderTransactionParametersPayloadDTO, StockOrderTransactionStatus},
+    },
 };
 
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "UPPERCASE")]
+pub enum OrderOperation {
+    PURCHASE,
+    SELL,
+}
+impl FromStr for OrderOperation {
+    type Err = ();
+    fn from_str(input: &str) -> Result<OrderOperation, Self::Err> {
+        match input {
+            "PURCHASE" => Ok(OrderOperation::PURCHASE),
+            "SELL" => Ok(OrderOperation::SELL),
+            _ => Err(()),
+        }
+    }
+}
+
 pub struct CreateStockOrderTransactionPayloadDTO {
+    pub operation: OrderOperation,
     pub stock: String,
     pub shares: usize,
 }
@@ -24,6 +49,7 @@ pub struct CreateStockOrderTransactionUseCaseParametersDTO {
 
 pub trait CreateStockOrderTransactionUseCaseConstructor<'a> {
     fn new(
+        stock_market_http_api_gateway: &'a Box<dyn StockMarketHttpAPIGateway + 'a>,
         stock_order_transaction_producer_gateway: &'a Box<
             dyn StockOrderTransactionProducerGateway + 'a,
         >,
@@ -39,6 +65,7 @@ pub trait CreateStockOrderTransactionUseCase:
 //  //  //
 
 pub struct CreateStockOrderTransactionUseCaseImpl<'a> {
+    stock_market_http_api_gateway: &'a Box<dyn StockMarketHttpAPIGateway + 'a>,
     stock_order_transaction_producer_gateway:
         &'a Box<dyn StockOrderTransactionProducerGateway + 'a>,
 }
@@ -51,11 +78,13 @@ impl<'a> CreateStockOrderTransactionUseCaseConstructor<'a>
     for CreateStockOrderTransactionUseCaseImpl<'a>
 {
     fn new(
+        stock_market_http_api_gateway: &'a Box<dyn StockMarketHttpAPIGateway + 'a>,
         stock_order_transaction_producer_gateway: &'a Box<
             dyn StockOrderTransactionProducerGateway + 'a,
         >,
     ) -> Self {
         CreateStockOrderTransactionUseCaseImpl {
+            stock_market_http_api_gateway,
             stock_order_transaction_producer_gateway,
         }
     }
@@ -68,37 +97,76 @@ impl<'a> UseCase<CreateStockOrderTransactionUseCaseParametersDTO, ()>
     async fn execute(
         &self,
         params: CreateStockOrderTransactionUseCaseParametersDTO,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        // TODO: look into anyhow, using box std errors seems kinda problematic
         let CreateStockOrderTransactionUseCaseParametersDTO {
             user_id,
-            payload: CreateStockOrderTransactionPayloadDTO { stock, shares },
+            payload:
+                CreateStockOrderTransactionPayloadDTO {
+                    operation,
+                    stock,
+                    shares,
+                },
         } = params;
 
-        // TODO
-        // Simulate making the transaction
-        let transaction_result: Result<bool, ()> = Ok(true);
-        let price = 0;
-        tokio::time::sleep(std::time::Duration::from_secs(5)).await;
-
-        let produce_stock_order_transaction_params = ProduceStockOrderTransactionParametersDTO {
-            user_id,
-            payload: StockOrderTransactionPayloadDTO {
-                stock,
-                shares,
-                price,
-            },
+        let transaction_result = {
+            match operation {
+                OrderOperation::PURCHASE => {
+                    self.stock_market_http_api_gateway
+                        .purchase_stock(PurchaseStockStockMarketGatewayParametersDTO {
+                            stock: stock.clone(),
+                            shares,
+                        })
+                        .await
+                }
+                OrderOperation::SELL => {
+                    self.stock_market_http_api_gateway
+                        .sell_stock(SellStockStockMarketGatewayParametersDTO {
+                            stock: stock.clone(),
+                            shares,
+                        })
+                        .await
+                }
+            }
         };
 
-        if transaction_result.is_ok() {
-            self.stock_order_transaction_producer_gateway
-                .produce_successful_stock_order_transaction(produce_stock_order_transaction_params)
-                .await?;
-        } else {
-            self.stock_order_transaction_producer_gateway
-                .produce_failed_stock_order_transaction(produce_stock_order_transaction_params)
-                .await?;
-        }
-
+        match transaction_result {
+            Ok(transaction) => {
+                let _ = self
+                    .stock_order_transaction_producer_gateway
+                    .produce_stock_order_transaction(
+                        ProduceStockOrderTransactionParametersDTO {
+                            user_id,
+                            payload: ProduceStockOrderTransactionParametersPayloadDTO {
+                                status: StockOrderTransactionStatus::SUCCESS,
+                                operation,
+                                stock,
+                                shares,
+                                price: transaction.price,
+                            },
+                        },
+                    )
+                    .await;
+            }
+            Err(error) => {
+                println!("Transaction failed, Error: {}", error);
+                let _ = self
+                    .stock_order_transaction_producer_gateway
+                    .produce_stock_order_transaction(
+                        ProduceStockOrderTransactionParametersDTO {
+                            user_id,
+                            payload: ProduceStockOrderTransactionParametersPayloadDTO {
+                                status: StockOrderTransactionStatus::FAIL,
+                                operation,
+                                stock,
+                                shares,
+                                price: -0.0,
+                            },
+                        },
+                    )
+                    .await;
+            }
+        }        
         Ok(())
     }
 }

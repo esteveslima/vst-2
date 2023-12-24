@@ -1,8 +1,8 @@
 use async_trait::async_trait;
-use std::convert::Infallible;
+use std::{convert::Infallible, str::FromStr};
 use validator::Validate;
 
-use crate::features::transactions_worker::application::use_cases::create_stock_order_transaction_use_case::{CreateStockOrderTransactionUseCase, CreateStockOrderTransactionUseCaseParametersDTO, CreateStockOrderTransactionPayloadDTO};
+use crate::features::transactions_worker::application::use_cases::create_stock_order_transaction_use_case::{CreateStockOrderTransactionUseCase, CreateStockOrderTransactionUseCaseParametersDTO, CreateStockOrderTransactionPayloadDTO, OrderOperation};
 
 use super::dtos::stock_order_stream_consume_data_dto::StockOrderStreamConsumeDataDTO;
 
@@ -70,11 +70,22 @@ impl<'a> StockOrderConsumer for StockOrderConsumerImpl<'a> {
             }
         }
 
-        let StockOrderStreamConsumeDataDTO { stock, shares } = parsed_payload;
+        let StockOrderStreamConsumeDataDTO {
+            operation,
+            stock,
+            shares,
+        } = parsed_payload;
+
+        let mapped_operation_enum = OrderOperation::from_str(&operation)
+            .expect(&format!("Invalid operation: {}", operation));
 
         let params = CreateStockOrderTransactionUseCaseParametersDTO {
             user_id,
-            payload: CreateStockOrderTransactionPayloadDTO { stock, shares },
+            payload: CreateStockOrderTransactionPayloadDTO {
+                operation: mapped_operation_enum,
+                stock,
+                shares,
+            },
         };
 
         let _use_case_result = self

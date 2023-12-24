@@ -17,12 +17,14 @@ pub struct TransactionUseCases<'a> {
 impl<'a> TransactionUseCasesFactory<'a> for TransactionUseCases<'a> {
     fn build(gateways: &'a TransactionGateways) -> TransactionUseCases<'a> {
         let TransactionGateways {
+            stock_market_http_api_gateway,
             stock_order_transaction_producer_gateway,
         } = gateways;
 
         TransactionUseCases {
             create_stock_order_transaction_use_case: Box::new(
                 CreateStockOrderTransactionUseCaseImpl::new(
+                    &stock_market_http_api_gateway,
                     &stock_order_transaction_producer_gateway,
                 ),
             ),

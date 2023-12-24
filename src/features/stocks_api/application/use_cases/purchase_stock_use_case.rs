@@ -16,7 +16,7 @@ pub struct PurchaseStockParametersPayloadDTO {
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct PurchaseStockParametersDTO {
-    pub user_id: usize,
+    pub user_id: String,
     pub payload: PurchaseStockParametersPayloadDTO,
 }
 
@@ -24,7 +24,7 @@ pub struct PurchaseStockParametersDTO {
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct PurchaseStockResultDTO {
-    pub id: usize,
+    pub id: String,
     pub stock: String,
     pub shares: usize,
     pub price: f32,
@@ -67,7 +67,7 @@ impl<'a> UseCase<PurchaseStockParametersDTO, PurchaseStockResultDTO>
     async fn execute(
         &self,
         params: PurchaseStockParametersDTO,
-    ) -> Result<PurchaseStockResultDTO, Box<dyn std::error::Error>> {
+    ) -> Result<PurchaseStockResultDTO, Box<dyn std::error::Error + Send + Sync>> {
         let PurchaseStockParametersDTO {
             user_id,
             payload: PurchaseStockParametersPayloadDTO { stock, shares },
@@ -85,7 +85,7 @@ impl<'a> UseCase<PurchaseStockParametersDTO, PurchaseStockResultDTO>
             .await;
 
         let result = PurchaseStockResultDTO {
-            id: 0,
+            id: 0.to_string(),
             stock: stock,
             shares: shares,
             price: 123.00,

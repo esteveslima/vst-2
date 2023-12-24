@@ -7,7 +7,7 @@ use crate::application::interfaces::use_case::UseCase;
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct GetStocksSummaryParametersDTO {
-    pub user_id: usize,
+    pub user_id: String,
 }
 
 //
@@ -59,7 +59,7 @@ impl UseCase<GetStocksSummaryParametersDTO, GetStocksSummaryResultDTO>
     async fn execute(
         &self,
         params: GetStocksSummaryParametersDTO,
-    ) -> Result<GetStocksSummaryResultDTO, Box<dyn std::error::Error>> {
+    ) -> Result<GetStocksSummaryResultDTO, Box<dyn std::error::Error + Send + Sync>> {
         let GetStocksSummaryParametersDTO { user_id: _ } = params;
 
         let result = GetStocksSummaryResultDTO {

@@ -17,7 +17,7 @@ pub struct SellStockParametersPayloadDTO {
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct SellStockParametersDTO {
-    pub user_id: usize,
+    pub user_id: String,
     pub payload: SellStockParametersPayloadDTO,
 }
 
@@ -25,7 +25,7 @@ pub struct SellStockParametersDTO {
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct SellStockResultDTO {
-    pub id: usize,
+    pub id: String,
     pub stock: String,
     pub shares: usize,
     pub price: f32,
@@ -63,7 +63,7 @@ impl<'a> UseCase<SellStockParametersDTO, SellStockResultDTO> for SellStockUseCas
     async fn execute(
         &self,
         params: SellStockParametersDTO,
-    ) -> Result<SellStockResultDTO, Box<dyn std::error::Error>> {
+    ) -> Result<SellStockResultDTO, Box<dyn std::error::Error + Send + Sync>> {
         tokio::time::sleep(std::time::Duration::from_secs(5)).await;
 
         let SellStockParametersDTO {
@@ -90,7 +90,7 @@ impl<'a> UseCase<SellStockParametersDTO, SellStockResultDTO> for SellStockUseCas
             .await;
 
         let result = SellStockResultDTO {
-            id: 0,
+            id: 0.to_string(),
             stock: stock,
             shares: shares,
             price: 123.45,
