@@ -3,8 +3,12 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     application::interfaces::use_case::UseCase,
-    features::stocks_api::application::interfaces::gateways::producers::stock_producer_gateway::{
-        OrderPayloadDTO, ProducePurchaseStockOrderParametersDTO, StockProducerGateway,
+    features::stocks_api::{
+        application::interfaces::gateways::producers::stock_producer_gateway::{
+            ProduceStockOrderParametersDTO, ProduceStockOrderPayloadParametersDTO,
+            StockOrderProducerGateway,
+        },
+        domain::entities::stock_order::StockOrderOperation,
     },
 };
 
@@ -27,13 +31,12 @@ pub struct PurchaseStockResultDTO {
     pub id: String,
     pub stock: String,
     pub shares: usize,
-    pub price: f32,
 }
 
 // // //
 
 pub trait PurchaseStockUseCaseConstructor<'a> {
-    fn new(stock_producer_gateway: &'a Box<dyn StockProducerGateway + 'a>) -> Self;
+    fn new(stock_producer_gateway: &'a Box<dyn StockOrderProducerGateway + 'a>) -> Self;
 }
 
 #[async_trait]
@@ -45,7 +48,7 @@ pub trait PurchaseStockUseCase:
 //  //  //
 
 pub struct PurchaseStockUseCaseImpl<'a> {
-    stock_producer_gateway: &'a Box<dyn StockProducerGateway + 'a>,
+    stock_producer_gateway: &'a Box<dyn StockOrderProducerGateway + 'a>,
 }
 
 //  //  //
@@ -53,7 +56,7 @@ pub struct PurchaseStockUseCaseImpl<'a> {
 impl<'a> PurchaseStockUseCase for PurchaseStockUseCaseImpl<'a> {}
 
 impl<'a> PurchaseStockUseCaseConstructor<'a> for PurchaseStockUseCaseImpl<'a> {
-    fn new(stock_producer_gateway: &'a Box<dyn StockProducerGateway + 'a>) -> Self {
+    fn new(stock_producer_gateway: &'a Box<dyn StockOrderProducerGateway + 'a>) -> Self {
         PurchaseStockUseCaseImpl {
             stock_producer_gateway,
         }
@@ -73,24 +76,22 @@ impl<'a> UseCase<PurchaseStockParametersDTO, PurchaseStockResultDTO>
             payload: PurchaseStockParametersPayloadDTO { stock, shares },
         } = params;
 
-        let _produce_result = self
+        let produce_result = self
             .stock_producer_gateway
-            .produce_purchase_stock_order(ProducePurchaseStockOrderParametersDTO {
+            .produce_stock_order(ProduceStockOrderParametersDTO {
                 user_id: user_id.to_string(),
-                payload: OrderPayloadDTO {
+                payload: ProduceStockOrderPayloadParametersDTO {
+                    operation: StockOrderOperation::PURCHASE,
                     shares: shares.clone(),
                     stock: stock.clone(),
                 },
             })
-            .await;
+            .await?;
 
-        let result = PurchaseStockResultDTO {
-            id: 0.to_string(),
-            stock: stock,
-            shares: shares,
-            price: 123.00,
-        };
-
-        return Ok(result);
+        Ok(PurchaseStockResultDTO {
+            id: produce_result.id,
+            stock,
+            shares,
+        })
     }
 }

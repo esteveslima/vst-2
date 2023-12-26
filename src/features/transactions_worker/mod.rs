@@ -5,7 +5,7 @@ pub mod adapters {
     pub mod entrypoints {
         pub mod consumers {
             pub mod dtos {
-                pub mod stock_order_stream_consume_data_dto;
+                pub mod stock_order_stream_consumer_data_dto;
             }
             pub mod stock_order_consumer;
         }
@@ -47,5 +47,11 @@ pub mod infrastructure {
     }
     pub mod routers {
         pub mod transaction_consumer_router;
+    }
+}
+
+pub mod domain {
+    pub mod entities {
+        pub mod stock_order_transaction;
     }
 }

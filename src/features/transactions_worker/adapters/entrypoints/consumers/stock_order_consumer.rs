@@ -2,9 +2,15 @@ use async_trait::async_trait;
 use std::{convert::Infallible, str::FromStr};
 use validator::Validate;
 
-use crate::features::transactions_worker::application::use_cases::create_stock_order_transaction_use_case::{CreateStockOrderTransactionUseCase, CreateStockOrderTransactionUseCaseParametersDTO, CreateStockOrderTransactionPayloadDTO, OrderOperation};
+use crate::features::transactions_worker::{
+    application::use_cases::create_stock_order_transaction_use_case::{
+        CreateStockOrderTransactionPayloadDTO, CreateStockOrderTransactionUseCase,
+        CreateStockOrderTransactionUseCaseParametersDTO,
+    },
+    domain::entities::stock_order_transaction::StockOrderTransactionOperation,
+};
 
-use super::dtos::stock_order_stream_consume_data_dto::StockOrderStreamConsumeDataDTO;
+use super::dtos::stock_order_stream_consumer_data_dto::StockOrderStreamConsumerDataDTO;
 
 pub trait StockOrderConsumerConstructor<'a> {
     fn new(
@@ -57,7 +63,7 @@ impl<'a> StockOrderConsumer for StockOrderConsumerImpl<'a> {
         let user_id = key.unwrap();
 
         let parsed_payload =
-            serde_json::from_str::<StockOrderStreamConsumeDataDTO>(&payload.as_str())
+            serde_json::from_str::<StockOrderStreamConsumerDataDTO>(&payload.as_str())
                 .expect(&format!("Failed to parse payload: {}", payload));
         match parsed_payload.validate() {
             Ok(_) => (),
@@ -70,13 +76,13 @@ impl<'a> StockOrderConsumer for StockOrderConsumerImpl<'a> {
             }
         }
 
-        let StockOrderStreamConsumeDataDTO {
+        let StockOrderStreamConsumerDataDTO {
             operation,
             stock,
             shares,
         } = parsed_payload;
 
-        let mapped_operation_enum = OrderOperation::from_str(&operation)
+        let mapped_operation_enum = StockOrderTransactionOperation::from_str(&operation)
             .expect(&format!("Invalid operation: {}", operation));
 
         let params = CreateStockOrderTransactionUseCaseParametersDTO {

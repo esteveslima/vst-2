@@ -95,7 +95,6 @@ impl<'a> StockController for StockControllerImpl<'a> {
             Ok(result) => {
                 let response = PurchaseStockRestResponseDTO {
                     id: result.id,
-                    price: result.price,
                     shares: result.shares,
                     stock: result.stock,
                 };
@@ -103,7 +102,7 @@ impl<'a> StockController for StockControllerImpl<'a> {
                     warp::reply::json(
                         &(APIResponse::<&PurchaseStockRestResponseDTO>::success(&response)),
                     ),
-                    warp::http::StatusCode::OK,
+                    warp::http::StatusCode::ACCEPTED,
                 )));
             }
             Err(error) => match error {
@@ -144,7 +143,6 @@ impl<'a> StockController for StockControllerImpl<'a> {
             Ok(result) => {
                 let response = SellStockRestResponseDTO {
                     id: result.id,
-                    price: result.price,
                     shares: result.shares,
                     stock: result.stock,
                 };
@@ -152,7 +150,7 @@ impl<'a> StockController for StockControllerImpl<'a> {
                     warp::reply::json(
                         &(APIResponse::<&SellStockRestResponseDTO>::success(&response)),
                     ),
-                    warp::http::StatusCode::OK,
+                    warp::http::StatusCode::ACCEPTED,
                 )));
             }
             Err(error) => match error {

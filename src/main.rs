@@ -13,8 +13,8 @@ use features::{
 use infrastructure::{
     configurations::env::env_loader,
     runners::{
-        stream_consumer_runner::{self, StreamConsumerRunnerParameters},
-        web_server_runner::{self, WebServerRunnerParameters},
+        stream_consumer_runner::{self, StreamConsumerRunnerInstances},
+        web_server_runner::{self, WebServerRunnerInstances},
     },
 };
 
@@ -48,11 +48,11 @@ lazy_static! {
 async fn main() {
     env_loader::load_env();
 
-    let web_server_runner = web_server_runner::setup_web_server_runner(WebServerRunnerParameters {
+    let web_server_runner = web_server_runner::setup_web_server_runner(WebServerRunnerInstances {
         stock_controller: &STOCK_FEATURE_ENTRYPOINTS_INSTANCES.stock_controller,
     });
     let stream_consumer_runner =
-        stream_consumer_runner::setup_stream_consumer_runner(StreamConsumerRunnerParameters {
+        stream_consumer_runner::setup_stream_consumer_runner(StreamConsumerRunnerInstances {
             stock_order_consumer: &TRANSACTION_FEATURE_ENTRYPOINTS_INSTANCES.stock_order_consumer,
         });
 
@@ -62,7 +62,7 @@ async fn main() {
 // TODOS:
 //V 1 - make the api produce stock orders
 //V 1.1 - add keys by user id to ensure ordering
-// 2 - make a worker module to handle the orders and generate the transactions   -> fix stock names to keep pattern
+//V 2 - make a worker module to handle the orders and generate the transactions   -> fix stock names to keep pattern
 // 3 - add materialize to docker environment
 // 4 - create a client to connect to materialize and add materialized views
 // 5 - maybe refactor to have the kafka data as entities

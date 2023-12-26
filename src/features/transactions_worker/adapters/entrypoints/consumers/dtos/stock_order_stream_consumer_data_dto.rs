@@ -7,7 +7,7 @@ lazy_static! {
 }
 
 #[derive(Deserialize, Serialize, Debug, Validate)]
-pub struct StockOrderStreamConsumeDataDTO {
+pub struct StockOrderStreamConsumerDataDTO {
     #[validate(regex(path = "ORDER_OPERATION_ENUM"))]
     pub operation: String,
 

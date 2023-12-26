@@ -1,19 +1,14 @@
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-use crate::features::transactions_worker::application::use_cases::create_stock_order_transaction_use_case::OrderOperation;
-
-#[derive(Deserialize, Serialize, Debug)]
-#[serde(rename_all = "UPPERCASE")]
-pub enum StockOrderTransactionStatus {
-    SUCCESS,
-    FAIL,
-}
+use crate::features::transactions_worker::domain::entities::stock_order_transaction::{
+    StockOrderTransactionOperation, StockOrderTransactionStatus,
+};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct ProduceStockOrderTransactionParametersPayloadDTO {
     pub status: StockOrderTransactionStatus,
-    pub operation: OrderOperation,
+    pub operation: StockOrderTransactionOperation,
     pub stock: String,
     pub shares: usize,
     pub price: f32,
@@ -31,7 +26,7 @@ pub trait StockOrderTransactionProducerGateway: Send + Sync {
     async fn produce_stock_order_transaction(
         &self,
         params: ProduceStockOrderTransactionParametersDTO,
-    ) -> Result<(), Box<dyn std::error::Error>>;
+    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
 }
 
 pub trait StockOrderTransactionProducerGatewayConstructor {

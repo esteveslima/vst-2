@@ -1,38 +1,36 @@
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
+use crate::features::stocks_api::domain::entities::stock_order::StockOrderOperation;
+
 #[derive(Deserialize, Serialize, Debug)]
-pub struct OrderPayloadDTO {
+pub struct ProduceStockOrderPayloadParametersDTO {
+    pub operation: StockOrderOperation,
     pub stock: String,
     pub shares: usize,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct ProducePurchaseStockOrderParametersDTO {
+pub struct ProduceStockOrderParametersDTO {
     pub user_id: String, // using the user id to ensure ordering
-    pub payload: OrderPayloadDTO,
+    pub payload: ProduceStockOrderPayloadParametersDTO,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct ProduceSellStockOrderParametersDTO {
-    pub user_id: String, // using the user id to ensure ordering
-    pub payload: OrderPayloadDTO,
+pub struct ProduceStockOrderResultDTO {
+    pub id: String,
 }
 
 //
 
 #[async_trait]
-pub trait StockProducerGateway: Send + Sync {
-    async fn produce_purchase_stock_order(
+pub trait StockOrderProducerGateway: Send + Sync {
+    async fn produce_stock_order(
         &self,
-        params: ProducePurchaseStockOrderParametersDTO,
-    ) -> Result<(), Box<dyn std::error::Error>>;
-    async fn produce_sell_stock_order(
-        &self,
-        params: ProduceSellStockOrderParametersDTO,
-    ) -> Result<(), Box<dyn std::error::Error>>;
+        params: ProduceStockOrderParametersDTO,
+    ) -> Result<ProduceStockOrderResultDTO, Box<dyn std::error::Error + Send + Sync>>;
 }
 
-pub trait StockProducerGatewayConstructor {
+pub trait StockOrderProducerGatewayConstructor {
     fn new() -> Self;
 }

@@ -1,7 +1,7 @@
 use crate::features::stocks_api::{
-    adapters::gateways::producers::stock_producer_gateway_impl::StockProducerGatewayImpl,
+    adapters::gateways::producers::stock_order_producer_gateway_impl::StockOrderProducerGatewayImpl,
     application::interfaces::gateways::producers::stock_producer_gateway::{
-        StockProducerGateway, StockProducerGatewayConstructor,
+        StockOrderProducerGateway, StockOrderProducerGatewayConstructor,
     },
 };
 
@@ -12,7 +12,7 @@ pub trait StockGatewaysFactory<'a> {
 //  //  //
 
 pub struct StockGateways<'a> {
-    pub stock_producer_gateway: Box<dyn StockProducerGateway + 'a>,
+    pub stock_producer_gateway: Box<dyn StockOrderProducerGateway + 'a>,
 }
 
 //  //  //
@@ -20,7 +20,7 @@ pub struct StockGateways<'a> {
 impl<'a> StockGatewaysFactory<'a> for StockGateways<'a> {
     fn build() -> StockGateways<'a> {
         StockGateways {
-            stock_producer_gateway: Box::new(StockProducerGatewayImpl::new()),
+            stock_producer_gateway: Box::new(StockOrderProducerGatewayImpl::new()),
         }
     }
 }

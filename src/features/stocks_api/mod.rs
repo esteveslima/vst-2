@@ -17,7 +17,7 @@ pub mod adapters {
     }
     pub mod gateways {
         pub mod producers {
-            pub mod stock_producer_gateway_impl;
+            pub mod stock_order_producer_gateway_impl;
         }
     }
 }
@@ -45,5 +45,11 @@ pub mod infrastructure {
     }
     pub mod routers {
         pub mod stock_controller_router;
+    }
+}
+
+pub mod domain {
+    pub mod entities {
+        pub mod stock_order;
     }
 }

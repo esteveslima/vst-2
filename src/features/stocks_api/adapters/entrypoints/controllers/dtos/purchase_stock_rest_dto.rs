@@ -17,5 +17,4 @@ pub struct PurchaseStockRestResponseDTO {
     pub id: String,
     pub stock: String,
     pub shares: usize,
-    pub price: f32,
 }

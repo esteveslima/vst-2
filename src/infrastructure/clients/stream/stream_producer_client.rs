@@ -7,37 +7,46 @@ use serde::Serialize;
 use std::time::Duration;
 
 //TODO: refactor to have producer + consumer in the same client?
-pub struct StreamProducerClientBuildParameters {
+pub struct StreamProducerClientBuildParametersDTO {
     pub broker_host: String,
     pub topic: String,
+}
+
+//
+
+pub struct StreamProducerClientProduceParametersDTO<T> {
+    pub payload: T,
+    pub optional_key: Option<String>,
+}
+pub struct StreamProducerClientProduceResultDTO {
+    pub id: String,
 }
 
 //  //  //
 
 pub trait StreamProducerClientConstructor {
-    fn new(params: StreamProducerClientBuildParameters) -> Self;
+    fn new(params: StreamProducerClientBuildParametersDTO) -> Self;
 }
 
 #[async_trait]
 pub trait StreamProducerClient: Send + Sync {
     async fn produce<T: Serialize + Send>(
         &self,
-        payload: T,
-        key: Option<String>,
-    ) -> Result<(), Box<dyn std::error::Error>>;
+        params: StreamProducerClientProduceParametersDTO<T>,
+    ) -> Result<StreamProducerClientProduceResultDTO, Box<dyn std::error::Error + Send + Sync>>;
 }
 
 //  //  //
 
 pub struct StreamProducerClientImpl {
     producer: FutureProducer,
-    params: StreamProducerClientBuildParameters,
+    params: StreamProducerClientBuildParametersDTO,
 }
 
 //  //  //
 
 impl StreamProducerClientConstructor for StreamProducerClientImpl {
-    fn new(params: StreamProducerClientBuildParameters) -> Self {
+    fn new(params: StreamProducerClientBuildParametersDTO) -> Self {
         let mut producer_client_config = ClientConfig::new();
         producer_client_config.set("bootstrap.servers", &params.broker_host);
         producer_client_config.set("allow.auto.create.topics", "true");
@@ -54,9 +63,14 @@ impl StreamProducerClientConstructor for StreamProducerClientImpl {
 impl StreamProducerClient for StreamProducerClientImpl {
     async fn produce<T: Serialize + Send>(
         &self,
-        payload: T,
-        optional_key: Option<String>,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+        params: StreamProducerClientProduceParametersDTO<T>,
+    ) -> Result<StreamProducerClientProduceResultDTO, Box<dyn std::error::Error + Send + Sync>>
+    {
+        let StreamProducerClientProduceParametersDTO {
+            payload,
+            optional_key,
+        } = params;
+
         let serialized_payload = serde_json::to_string(&payload).expect("Failed to serialize data");
         let mut future_record =
             FutureRecord::<String, _>::to(&self.params.topic.as_str()).payload(&serialized_payload);
@@ -72,7 +86,9 @@ impl StreamProducerClient for StreamProducerClientImpl {
             .await;
 
         match message_result {
-            Ok(_delivery) => Ok(()),
+            Ok(delivery) => Ok(StreamProducerClientProduceResultDTO {
+                id: format!("{}_{}", delivery.0, delivery.1), // compose the id with the partition and offset of the message
+            }),
             Err((error, _)) => Err(Box::new(error)),
         }
     }

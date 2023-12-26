@@ -15,7 +15,7 @@ use rdkafka::{
 };
 
 #[derive(Clone, Debug)]
-pub struct StreamConsumerClientListenParameters {
+pub struct StreamConsumerClientListenParametersDTO {
     pub broker_host: String,
     pub topic: String,
     pub optional_group: Option<String>,
@@ -25,7 +25,7 @@ pub struct StreamConsumerClientListenParameters {
 
 #[async_trait]
 pub trait StreamConsumerClient {
-    async fn listen<F, Fut>(params: StreamConsumerClientListenParameters, handler: F)
+    async fn listen<F, Fut>(params: StreamConsumerClientListenParametersDTO, handler: F)
     where
         F: Send + Copy + Sync + Fn(Option<String>, String) -> Fut,
         Fut: Future<Output = Result<(), Infallible>> + Send;
@@ -39,12 +39,12 @@ pub struct StreamConsumerClientImpl;
 
 #[async_trait]
 impl StreamConsumerClient for StreamConsumerClientImpl {
-    async fn listen<F, Fut>(params: StreamConsumerClientListenParameters, handler: F)
+    async fn listen<F, Fut>(params: StreamConsumerClientListenParametersDTO, handler: F)
     where
         F: Send + Copy + Sync + Fn(Option<String>, String) -> Fut,
         Fut: Future<Output = Result<(), Infallible>> + Send,
     {
-        let StreamConsumerClientListenParameters {
+        let StreamConsumerClientListenParametersDTO {
             broker_host,
             topic,
             optional_group,
@@ -169,7 +169,7 @@ impl StreamConsumerClient for StreamConsumerClientImpl {
     // // TODO: Handle the consumed message in parallel, asynchronously
     // // P.S.1: There might be problems moving references into tokio task
     // // P.S.2: Commiting messages asynchronously may lead into problems with kafka offset order
-    // async fn setup_async<F, Fut>(params: StreamConsumerClientListenParameters, handler: F)
+    // async fn setup_async<F, Fut>(params: StreamConsumerClientListenParametersDTO, handler: F)
     // where
     //     F: Send + Copy + Sync + 'static + Fn(String) -> Fut,
     //     Fut: Future<Output = Result<(), Infallible>> + Send,
