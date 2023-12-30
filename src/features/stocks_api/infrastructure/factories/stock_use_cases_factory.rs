@@ -28,6 +28,7 @@ impl<'a> StockUseCasesFactory<'a> for StockUseCases<'a> {
     fn build(gateways: &'a StockGateways) -> StockUseCases<'a> {
         let StockGateways {
             stock_producer_gateway,
+            stock_order_transaction_dao_gateway,
         } = gateways;
 
         StockUseCases {
@@ -35,7 +36,9 @@ impl<'a> StockUseCasesFactory<'a> for StockUseCases<'a> {
                 &stock_producer_gateway,
             )),
             sell_stock_use_case: Box::new(SellStockUseCaseImpl::new(&stock_producer_gateway)),
-            get_stocks_summary_use_case: Box::new(GetStocksSummaryUseCaseImpl::new()),
+            get_stocks_summary_use_case: Box::new(GetStocksSummaryUseCaseImpl::new(
+                &stock_order_transaction_dao_gateway,
+            )),
         }
     }
 }

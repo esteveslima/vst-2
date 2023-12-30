@@ -16,7 +16,7 @@ clean-down:
 rebuild:
 	make down && make up
 
-# access docker environmnet
+# access docker environment
 sh:
 	docker-compose --file $(COMPOSE_FILE_PATH) --project-name $(COMPOSE_PROJECT_NAME) exec --privileged $(COMPOSE_SERVICE_NAME) bash
 bash:
@@ -26,4 +26,7 @@ bash:
 clear:
 	sudo find . -type d \( -name "target" -or -name ".volumes" \) -prune -exec rm -rf {} \;
 reset-permissions:
-	sudo chown -R $(id -u):$(id -g) .
+	sudo chown -R $$(whoami) .
+# P.S.: The command in "reset-permissions" was created to solve permission problems with rust-analyzer. Use it and restart the server.
+# Sometimes when the project is built from within the docker environment the folders/files are created by root, therefore are also owned by root...
+# ... this can cause problems with rust-analyzer, which is not running as root.

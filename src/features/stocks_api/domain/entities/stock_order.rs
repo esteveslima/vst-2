@@ -1,7 +1,8 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, PartialEq, Clone, Debug)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum StockOrderOperation {
     PURCHASE,
@@ -18,10 +19,12 @@ impl FromStr for StockOrderOperation {
     }
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct StockOrder {
+    pub id: String,
     pub user_id: String,
     pub operation: StockOrderOperation,
+    pub date: DateTime<Utc>,
     pub stock: String,
     pub shares: usize,
 }

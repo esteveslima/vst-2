@@ -1,9 +1,9 @@
 use warp::Filter;
 
-use crate::features::stocks_api::adapters::entrypoints::controllers::stock_controller::StockController;
+use crate::features::stocks_api::adapters::entrypoints::controllers::stock_order_controller::StockOrderController;
 
 pub fn setup_controller_router<'a: 'static>(
-    controller: &'a Box<dyn StockController + 'a>,
+    controller: &'a Box<dyn StockOrderController + 'a>,
 ) -> impl warp::Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone + 'a {
     // .../stocks/...
     let base_route = warp::path("stocks");

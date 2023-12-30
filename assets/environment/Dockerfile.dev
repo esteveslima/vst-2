@@ -12,7 +12,7 @@ RUN apt-get install bash curl && \
 RUN cargo install cargo-watch && \
     rustup component add rustfmt
 
-# Change and config user
+# Config environment
 ENV EDITOR=nano
 ENV LESS=R
 RUN echo "complete -d cd" >> ~/.bashrc

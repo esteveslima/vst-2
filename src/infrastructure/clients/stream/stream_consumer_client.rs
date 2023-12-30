@@ -166,7 +166,7 @@ impl StreamConsumerClient for StreamConsumerClientImpl {
         }
     }
 
-    // // TODO: Handle the consumed message in parallel, asynchronously
+    // // Potential improvement: Handle the consumed message in parallel, asynchronously
     // // P.S.1: There might be problems moving references into tokio task
     // // P.S.2: Commiting messages asynchronously may lead into problems with kafka offset order
     // async fn setup_async<F, Fut>(params: StreamConsumerClientListenParametersDTO, handler: F)

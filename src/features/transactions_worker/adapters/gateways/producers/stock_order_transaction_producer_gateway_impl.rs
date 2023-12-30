@@ -1,10 +1,13 @@
 use async_trait::async_trait;
+use chrono::Utc;
+use uuid::Uuid;
 
 use crate::{
     features::transactions_worker::{
         application::interfaces::gateways::producers::stock_order_transaction_producer_gateway::{
             ProduceStockOrderTransactionParametersDTO,
-            ProduceStockOrderTransactionParametersPayloadDTO, StockOrderTransactionProducerGateway,
+            ProduceStockOrderTransactionParametersPayloadDTO,
+            ProduceStockOrderTransactionResultDTO, StockOrderTransactionProducerGateway,
             StockOrderTransactionProducerGatewayConstructor,
         },
         domain::entities::stock_order_transaction::StockOrderTransaction,
@@ -44,7 +47,8 @@ impl StockOrderTransactionProducerGateway for StockOrderTransactionProducerGatew
     async fn produce_stock_order_transaction(
         &self,
         params: ProduceStockOrderTransactionParametersDTO,
-    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    ) -> Result<ProduceStockOrderTransactionResultDTO, Box<dyn std::error::Error + Send + Sync>>
+    {
         let ProduceStockOrderTransactionParametersDTO {
             user_id,
             payload:
@@ -59,9 +63,11 @@ impl StockOrderTransactionProducerGateway for StockOrderTransactionProducerGatew
 
         let key = Some(user_id.clone());
         let stock_order_transaction = StockOrderTransaction {
+            id: Uuid::new_v4().to_string(),
             user_id,
             status,
             operation,
+            date: Utc::now(),
             shares,
             stock,
             price,
@@ -69,11 +75,13 @@ impl StockOrderTransactionProducerGateway for StockOrderTransactionProducerGatew
 
         self.stock_order_transaction_producer_client
             .produce(StreamProducerClientProduceParametersDTO {
-                payload: stock_order_transaction,
+                payload: stock_order_transaction.clone(),
                 optional_key: key,
             })
             .await?;
 
-        Ok(())
+        Ok(ProduceStockOrderTransactionResultDTO {
+            id: stock_order_transaction.id,
+        })
     }
 }

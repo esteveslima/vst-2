@@ -4,7 +4,7 @@
 pub mod adapters {
     pub mod entrypoints {
         pub mod controllers {
-            pub mod stock_controller;
+            pub mod stock_order_controller;
             pub mod dtos {
                 pub mod get_stocks_summary_rest_dto;
                 pub mod purchase_stock_rest_dto;
@@ -16,6 +16,9 @@ pub mod adapters {
         }
     }
     pub mod gateways {
+        pub mod daos {
+            pub mod stock_order_transaction_dao_gateway_impl;
+        }
         pub mod producers {
             pub mod stock_order_producer_gateway_impl;
         }
@@ -25,8 +28,11 @@ pub mod adapters {
 pub mod application {
     pub mod interfaces {
         pub mod gateways {
+            pub mod daos {
+                pub mod stock_order_transaction_dao_gateway;
+            }
             pub mod producers {
-                pub mod stock_producer_gateway;
+                pub mod stock_order_producer_gateway;
             }
         }
     }

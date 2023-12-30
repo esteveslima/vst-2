@@ -19,9 +19,10 @@ services:
             - 3030:3030
 
     kafka-container:                                                # Setting up local testing environment with kafka
-        image: bitnami/kafka
-        # volumes:
-        #     - ./.volumes/.kafka-storage:/bitnami
+        image: bitnami/kafka        
+        volumes:                                                                        # apparently requires root user(potential security concern?)
+            - ./.volumes/.kafka-storage:/bitnami/kafka
+        user: root
         environment:
             - KAFKA_CFG_NODE_ID=0
             - KAFKA_CFG_PROCESS_ROLES=controller,broker
@@ -31,6 +32,7 @@ services:
             - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
             - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
             - KAFKA_JMX_PORT=9997
+            - KAFKA_CFG_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM=""
         restart: "no"
         expose:
             - '9092'
@@ -48,6 +50,24 @@ services:
             - kafka-container
         ports:
             - 8080:8080                                                # interface available at http://localhost:8080
+
+    materialize-container:
+        image: materialize/materialized:mzbuild-ECJTLNFHAI3AAOYSXLWJRXZSZIF6QECC        # found a tag that doesn't use ssl requests to kafka broker
+        volumes:                                                                        # apparently requires root user(potential security concern?)
+            - ./.volumes/.materialize-storage:/mzdata
+        user: root
+        # environment:
+        #     -
+        restart: always
+        depends_on:
+            - kafka-container
+        expose:
+            - '6875'
+            - '6876'
+        ports:
+            - '6875:6875'
+            - '6876:6876'
+            
 
     # postgres-container:                                              # Setting up local testing environment with postgres
     #     image: postgres

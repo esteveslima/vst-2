@@ -19,6 +19,11 @@ pub struct ProduceStockOrderTransactionParametersDTO {
     pub payload: ProduceStockOrderTransactionParametersPayloadDTO,
 }
 
+#[derive(Deserialize, Serialize, Debug)]
+pub struct ProduceStockOrderTransactionResultDTO {
+    pub id: String,
+}
+
 //
 
 #[async_trait]
@@ -26,7 +31,7 @@ pub trait StockOrderTransactionProducerGateway: Send + Sync {
     async fn produce_stock_order_transaction(
         &self,
         params: ProduceStockOrderTransactionParametersDTO,
-    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
+    ) -> Result<ProduceStockOrderTransactionResultDTO, Box<dyn std::error::Error + Send + Sync>>;
 }
 
 pub trait StockOrderTransactionProducerGatewayConstructor {

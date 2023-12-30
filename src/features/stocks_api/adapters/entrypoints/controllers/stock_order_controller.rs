@@ -3,7 +3,9 @@ use std::convert::Infallible;
 use validator::Validate;
 use warp::reply::Reply;
 
-use super::dtos::get_stocks_summary_rest_dto::GetStocksSummaryRestResponseDTO;
+use super::dtos::get_stocks_summary_rest_dto::{
+    GetStocksSummaryRestResponseDTO, GetStocksSummaryRestResponseItemDTO,
+};
 use super::dtos::purchase_stock_rest_dto::{
     PurchaseStockRestRequestBodyDTO, PurchaseStockRestResponseDTO,
 };
@@ -20,7 +22,7 @@ use crate::features::stocks_api::application::use_cases::sell_stock_use_case::{
     SellStockParametersDTO, SellStockParametersPayloadDTO, SellStockUseCase,
 };
 
-pub trait StockControllerConstructor<'a> {
+pub trait StockOrderControllerConstructor<'a> {
     fn new(
         get_stocks_summary_use_case: &'a Box<dyn GetStocksSummaryUseCase + 'a>,
         purchase_stock_use_case: &'a Box<dyn PurchaseStockUseCase + 'a>,
@@ -29,7 +31,7 @@ pub trait StockControllerConstructor<'a> {
 }
 
 #[async_trait]
-pub trait StockController: Sync {
+pub trait StockOrderController: Sync {
     async fn purchase_stock(
         &self,
         body: PurchaseStockRestRequestBodyDTO,
@@ -43,7 +45,7 @@ pub trait StockController: Sync {
 
 //  //  //
 
-pub struct StockControllerImpl<'a> {
+pub struct StockOrderControllerImpl<'a> {
     purchase_stock_use_case: &'a Box<dyn PurchaseStockUseCase + 'a>,
     sell_stock_use_case: &'a Box<dyn SellStockUseCase + 'a>,
     get_stocks_summary_use_case: &'a Box<dyn GetStocksSummaryUseCase + 'a>,
@@ -51,13 +53,13 @@ pub struct StockControllerImpl<'a> {
 
 //  //  //
 
-impl<'a> StockControllerConstructor<'a> for StockControllerImpl<'a> {
+impl<'a> StockOrderControllerConstructor<'a> for StockOrderControllerImpl<'a> {
     fn new(
         get_stocks_summary_use_case: &'a Box<dyn GetStocksSummaryUseCase + 'a>,
         purchase_stock_use_case: &'a Box<dyn PurchaseStockUseCase + 'a>,
         sell_stock_use_case: &'a Box<dyn SellStockUseCase + 'a>,
     ) -> Self {
-        StockControllerImpl {
+        StockOrderControllerImpl {
             purchase_stock_use_case,
             sell_stock_use_case,
             get_stocks_summary_use_case,
@@ -66,7 +68,7 @@ impl<'a> StockControllerConstructor<'a> for StockControllerImpl<'a> {
 }
 
 #[async_trait]
-impl<'a> StockController for StockControllerImpl<'a> {
+impl<'a> StockOrderController for StockOrderControllerImpl<'a> {
     async fn purchase_stock(
         &self,
         body: PurchaseStockRestRequestBodyDTO,
@@ -107,10 +109,13 @@ impl<'a> StockController for StockControllerImpl<'a> {
             }
             Err(error) => match error {
                 // SomeErr => ...
-                _ => Ok(Box::new(warp::reply::with_status(
-                    warp::reply::json(&(APIResponse::<&str>::error("Internal Server error"))),
-                    warp::http::StatusCode::INTERNAL_SERVER_ERROR,
-                ))),
+                _ => {
+                    eprintln!("{}", error);
+                    Ok(Box::new(warp::reply::with_status(
+                        warp::reply::json(&(APIResponse::<&str>::error("Internal Server error"))),
+                        warp::http::StatusCode::INTERNAL_SERVER_ERROR,
+                    )))
+                }
             },
         }
     }
@@ -155,10 +160,13 @@ impl<'a> StockController for StockControllerImpl<'a> {
             }
             Err(error) => match error {
                 // SomeErr => ...
-                _ => Ok(Box::new(warp::reply::with_status(
-                    warp::reply::json(&(APIResponse::<&str>::error("Internal Server error"))),
-                    warp::http::StatusCode::INTERNAL_SERVER_ERROR,
-                ))),
+                _ => {
+                    eprintln!("{}", error);
+                    Ok(Box::new(warp::reply::with_status(
+                        warp::reply::json(&(APIResponse::<&str>::error("Internal Server error"))),
+                        warp::http::StatusCode::INTERNAL_SERVER_ERROR,
+                    )))
+                }
             },
         }
     }
@@ -174,14 +182,20 @@ impl<'a> StockController for StockControllerImpl<'a> {
         match use_case_result {
             Ok(result) => {
                 let response = GetStocksSummaryRestResponseDTO {
-                    stock_name: result.stock_name,
-                    total_shares: result.total_shares,
-                    total_value: result.total_value,
-                    date_purchase: result.date_purchase,
-                    variation_purchase: result.variation_purchase,
-                    day_max: result.day_max,
-                    day_avg: result.day_avg,
-                    day_min: result.day_min,
+                    stocks: result
+                        .stocks
+                        .iter()
+                        .map(|owned_stock| GetStocksSummaryRestResponseItemDTO {
+                            stock: owned_stock.stock.clone(),
+                            total_shares: owned_stock.total_shares,
+                            total_purchase_price: owned_stock.total_purchase_price,
+                            date_first_purchase: owned_stock.date_first_purchase.to_string(),
+                            variation_purchase: owned_stock.variation_purchase,
+                            day_max: owned_stock.day_max,
+                            day_avg: owned_stock.day_avg,
+                            day_min: owned_stock.day_min,
+                        })
+                        .collect(),
                 };
                 return Ok(Box::new(warp::reply::with_status(
                     warp::reply::json(
@@ -192,10 +206,13 @@ impl<'a> StockController for StockControllerImpl<'a> {
             }
             Err(error) => match error {
                 // SomeErr => ...
-                _ => Ok(Box::new(warp::reply::with_status(
-                    warp::reply::json(&(APIResponse::<&str>::error("Internal Server error"))),
-                    warp::http::StatusCode::INTERNAL_SERVER_ERROR,
-                ))),
+                _ => {
+                    eprintln!("{}", error);
+                    Ok(Box::new(warp::reply::with_status(
+                        warp::reply::json(&(APIResponse::<&str>::error("Internal Server error"))),
+                        warp::http::StatusCode::INTERNAL_SERVER_ERROR,
+                    )))
+                }
             },
         }
     }

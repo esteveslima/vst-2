@@ -51,6 +51,8 @@ impl StreamProducerClientConstructor for StreamProducerClientImpl {
         producer_client_config.set("bootstrap.servers", &params.broker_host);
         producer_client_config.set("allow.auto.create.topics", "true");
 
+        //TODO: allow setting the number of partitions for autocreate?
+
         let producer = producer_client_config
             .create::<FutureProducer>()
             .expect("Failed to connect producer to kafka");

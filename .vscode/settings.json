@@ -1,4 +1,13 @@
-{
-    "editor.inlayHints.enabled": "offUnlessPressed", // Ctrl + Alt
-    "rust-analyzer.showUnlinkedFileNotification": false, 
+{            
+    "editor.inlayHints.enabled": "offUnlessPressed",                    // Ctrl + Alt
+    "editor.formatOnSave": true,
+    "rust-analyzer.checkOnSave": false,
+    "[rust]": {
+        "editor.defaultFormatter": "rust-lang.rust-analyzer"
+    },
+
+    // "bug" fixes
+    "rust-analyzer.diagnostics.disabled": ["unresolved-proc-macro"],    // seems to be causing problems
+    "rust-analyzer.showUnlinkedFileNotification": false,    
+
 }

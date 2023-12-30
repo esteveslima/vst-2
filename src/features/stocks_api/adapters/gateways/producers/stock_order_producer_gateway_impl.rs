@@ -1,8 +1,10 @@
 use async_trait::async_trait;
+use chrono::Utc;
+use uuid::Uuid;
 
 use crate::{
     features::stocks_api::{
-        application::interfaces::gateways::producers::stock_producer_gateway::{
+        application::interfaces::gateways::producers::stock_order_producer_gateway::{
             ProduceStockOrderParametersDTO, ProduceStockOrderPayloadParametersDTO,
             ProduceStockOrderResultDTO, StockOrderProducerGateway,
             StockOrderProducerGatewayConstructor,
@@ -53,22 +55,22 @@ impl StockOrderProducerGateway for StockOrderProducerGatewayImpl {
 
         let key = Some(user_id.clone());
         let stock_order = StockOrder {
+            id: Uuid::new_v4().to_string(),
             user_id,
             operation,
+            date: Utc::now(),
             shares,
             stock,
         };
 
-        let produce_result = self
+        let _produce_result = self
             .stock_order_producer_client
             .produce(StreamProducerClientProduceParametersDTO {
-                payload: stock_order,
+                payload: stock_order.clone(),
                 optional_key: key,
             })
             .await?; //TODO: create custom errors(also, look into anyhow)
 
-        Ok(ProduceStockOrderResultDTO {
-            id: produce_result.id,
-        })
+        Ok(ProduceStockOrderResultDTO { id: stock_order.id })
     }
 }

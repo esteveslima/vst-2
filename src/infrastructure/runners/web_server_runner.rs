@@ -1,11 +1,11 @@
 use crate::features::stocks_api::{
-    adapters::entrypoints::controllers::stock_controller::StockController,
+    adapters::entrypoints::controllers::stock_order_controller::StockOrderController,
     infrastructure::routers::stock_controller_router,
 };
 use warp::Filter;
 
 pub struct WebServerRunnerInstances<'a> {
-    pub stock_controller: &'a Box<dyn StockController>,
+    pub stock_controller: &'a Box<dyn StockOrderController>,
 }
 
 pub async fn setup_web_server_runner<'a: 'static>(params: WebServerRunnerInstances<'a>) {

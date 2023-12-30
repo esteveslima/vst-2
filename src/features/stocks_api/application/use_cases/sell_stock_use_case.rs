@@ -5,7 +5,7 @@ use std;
 use crate::{
     application::interfaces::use_case::UseCase,
     features::stocks_api::{
-        application::interfaces::gateways::producers::stock_producer_gateway::{
+        application::interfaces::gateways::producers::stock_order_producer_gateway::{
             ProduceStockOrderParametersDTO, ProduceStockOrderPayloadParametersDTO,
             StockOrderProducerGateway,
         },
