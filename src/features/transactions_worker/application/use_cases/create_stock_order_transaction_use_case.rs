@@ -120,6 +120,8 @@ impl<'a> UseCase<CreateStockOrderTransactionUseCaseParametersDTO, ()>
             }
         };
 
+        // TODO: check if is sell and shares >= 1
+
         match transaction_result {
             Ok(transaction) => {
                 let _ = self

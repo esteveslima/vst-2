@@ -34,13 +34,15 @@ pub trait StockOrderControllerConstructor<'a> {
 pub trait StockOrderController: Sync {
     async fn purchase_stock(
         &self,
+        user_id: String,
         body: PurchaseStockRestRequestBodyDTO,
     ) -> Result<Box<dyn Reply>, Infallible>;
     async fn sell_stock(
         &self,
+        user_id: String,
         body: SellStockRestRequestBodyDTO,
     ) -> Result<Box<dyn Reply>, Infallible>;
-    async fn get_stocks_summary(&self) -> Result<Box<dyn Reply>, Infallible>;
+    async fn get_stocks_summary(&self, user_id: String) -> Result<Box<dyn Reply>, Infallible>;
 }
 
 //  //  //
@@ -71,6 +73,7 @@ impl<'a> StockOrderControllerConstructor<'a> for StockOrderControllerImpl<'a> {
 impl<'a> StockOrderController for StockOrderControllerImpl<'a> {
     async fn purchase_stock(
         &self,
+        user_id: String,
         body: PurchaseStockRestRequestBodyDTO,
     ) -> Result<Box<dyn Reply>, Infallible> {
         match body.validate() {
@@ -82,9 +85,9 @@ impl<'a> StockOrderController for StockOrderControllerImpl<'a> {
                 )))
             }
         }
-        let mock_user_id = 0.to_string();
+
         let params = PurchaseStockParametersDTO {
-            user_id: mock_user_id,
+            user_id,
             payload: PurchaseStockParametersPayloadDTO {
                 shares: body.shares,
                 stock: body.stock,
@@ -122,6 +125,7 @@ impl<'a> StockOrderController for StockOrderControllerImpl<'a> {
 
     async fn sell_stock(
         &self,
+        user_id: String,
         body: SellStockRestRequestBodyDTO,
     ) -> Result<Box<dyn Reply>, Infallible> {
         match body.validate() {
@@ -133,9 +137,9 @@ impl<'a> StockOrderController for StockOrderControllerImpl<'a> {
                 )))
             }
         }
-        let mock_user_id = 0.to_string();
+
         let params = SellStockParametersDTO {
-            user_id: mock_user_id,
+            user_id,
             payload: SellStockParametersPayloadDTO {
                 shares: body.shares,
                 stock: body.stock,
@@ -171,11 +175,8 @@ impl<'a> StockOrderController for StockOrderControllerImpl<'a> {
         }
     }
 
-    async fn get_stocks_summary(&self) -> Result<Box<dyn Reply>, Infallible> {
-        let mock_user_id = 0;
-        let params = GetStocksSummaryParametersDTO {
-            user_id: mock_user_id.to_string(),
-        };
+    async fn get_stocks_summary(&self, user_id: String) -> Result<Box<dyn Reply>, Infallible> {
+        let params = GetStocksSummaryParametersDTO { user_id };
 
         let use_case_result = self.get_stocks_summary_use_case.execute(params).await;
 

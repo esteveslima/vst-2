@@ -7,13 +7,91 @@
 	},
 	"item": [
 		{
+			"name": "stock_market_apis",
+			"item": [
+				{
+					"name": "https://api.nasdaq.com/api/quote/:stock/info?assetclass=stocks",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.nasdaq.com/api/quote/:stock/info?assetclass=stocks",
+							"protocol": "https",
+							"host": [
+								"api",
+								"nasdaq",
+								"com"
+							],
+							"path": [
+								"api",
+								"quote",
+								":stock",
+								"info"
+							],
+							"query": [
+								{
+									"key": "assetclass",
+									"value": "stocks"
+								}
+							],
+							"variable": [
+								{
+									"key": "stock",
+									"value": "AAPL"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "https://www.alphavantage.co/documentation/#intraday",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=IBM&interval=5min&apikey=demo",
+							"protocol": "https",
+							"host": [
+								"www",
+								"alphavantage",
+								"co"
+							],
+							"path": [
+								"query"
+							],
+							"query": [
+								{
+									"key": "function",
+									"value": "TIME_SERIES_INTRADAY"
+								},
+								{
+									"key": "symbol",
+									"value": "IBM"
+								},
+								{
+									"key": "interval",
+									"value": "5min"
+								},
+								{
+									"key": "apikey",
+									"value": "demo"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "/stocks/purchase",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"stock\": \"abc\",\n    \"shares\": 1\n}",
+					"raw": "{\n    \"stock\": \"AAPL\",\n    \"shares\": 1\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -21,12 +99,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3030/stocks/purchase",
-					"protocol": "http",
+					"raw": "{{HOST}}/stocks/purchase",
 					"host": [
-						"localhost"
+						"{{HOST}}"
 					],
-					"port": "3030",
 					"path": [
 						"stocks",
 						"purchase"
@@ -42,7 +118,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"stock\": \"abc\",\n    \"shares\": 1\n}",
+					"raw": "{\n    \"stock\": \"AAPL\",\n    \"shares\": 1\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -50,12 +126,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3030/stocks/sell",
-					"protocol": "http",
+					"raw": "{{HOST}}/stocks/sell",
 					"host": [
-						"localhost"
+						"{{HOST}}"
 					],
-					"port": "3030",
 					"path": [
 						"stocks",
 						"sell"
@@ -63,8 +137,41 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "/stocks/summary",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{HOST}}/stocks/summary",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"stocks",
+						"summary"
+					]
+				}
+			},
+			"response": []
 		}
 	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "1",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "USER_ID",
+				"type": "string"
+			}
+		]
+	},
 	"event": [
 		{
 			"listen": "prerequest",
@@ -89,6 +196,11 @@
 		{
 			"key": "HOST",
 			"value": "http://localhost:3030",
+			"type": "string"
+		},
+		{
+			"key": "USER_ID",
+			"value": "",
 			"type": "string"
 		}
 	]
