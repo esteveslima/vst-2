@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std;
 
-use crate::{application::interfaces::use_case::UseCase, features::{stocks_api::application::interfaces::gateways::daos::stock_order_transaction_dao_gateway::{StockOrderTransactionDAOGateway, GetWalletParametersDTO, GetWalletHistoricalStatisticsParametersDTO}, transactions_worker::domain::entities::stock_order_transaction::StockOrderTransactionOperation}};
+use crate::{common::application::interfaces::use_case::UseCase, features::{stocks_api::application::interfaces::gateways::daos::stock_order_transaction_dao_gateway::{StockOrderTransactionDAOGateway, GetWalletParametersDTO, GetWalletHistoricalStatisticsParametersDTO}, transactions_worker::domain::entities::stock_order_transaction::StockOrderTransactionOperation}};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct GetStocksSummaryParametersDTO {

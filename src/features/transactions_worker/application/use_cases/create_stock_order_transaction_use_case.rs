@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 
 use crate::{
-    application::interfaces::use_case::UseCase,
+    common::application::interfaces::use_case::UseCase,
     features::transactions_worker::{
         application::interfaces::gateways::{
             http::stock_market_http_api_gateway::{

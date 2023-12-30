@@ -3,6 +3,11 @@ use chrono::Utc;
 use uuid::Uuid;
 
 use crate::{
+    common::infrastructure::clients::stream::stream_producer_client::{
+        StreamProducerClient, StreamProducerClientBuildParametersDTO,
+        StreamProducerClientConstructor, StreamProducerClientImpl,
+        StreamProducerClientProduceParametersDTO,
+    },
     features::transactions_worker::{
         application::interfaces::gateways::producers::stock_order_transaction_producer_gateway::{
             ProduceStockOrderTransactionParametersDTO,
@@ -11,11 +16,6 @@ use crate::{
             StockOrderTransactionProducerGatewayConstructor,
         },
         domain::entities::stock_order_transaction::StockOrderTransaction,
-    },
-    infrastructure::clients::stream::stream_producer_client::{
-        StreamProducerClient, StreamProducerClientBuildParametersDTO,
-        StreamProducerClientConstructor, StreamProducerClientImpl,
-        StreamProducerClientProduceParametersDTO,
     },
 };
 

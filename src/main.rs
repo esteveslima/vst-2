@@ -1,3 +1,10 @@
+use common::infrastructure::{
+    configurations::env::env_loader,
+    runners::{
+        stream_consumer_runner::{self, StreamConsumerRunnerInstances},
+        web_server_runner::{self, WebServerRunnerInstances},
+    },
+};
 use features::{
     stocks_api::infrastructure::factories::{
         stock_entrypoints_factory::{StockEntrypoints, StockEntrypointsFactory},
@@ -10,16 +17,8 @@ use features::{
         transaction_use_cases_factory::{TransactionUseCases, TransactionUseCasesFactory},
     },
 };
-use infrastructure::{
-    configurations::env::env_loader,
-    runners::{
-        stream_consumer_runner::{self, StreamConsumerRunnerInstances},
-        web_server_runner::{self, WebServerRunnerInstances},
-    },
-};
 
-pub mod application;
-pub mod infrastructure;
+pub mod common;
 pub mod features {
     pub mod stocks_api;
     pub mod transactions_worker;
@@ -74,9 +73,9 @@ async fn main() {
 //V 3 - add materialize to docker environment
 //V 4 - create a client to connect to materialize and add materialized views
 //V 5 - maybe refactor to have the kafka data as entities
-// 5.1 - reevaluate to add them as simple producer models
+//V 5.1 - reevaluate to add them as simple producer models
 //V 6 - create queries to fetch data from materialized the views
-// 6.1 - move common files into a "common" folder
+//V 6.1 - move common files into a "common" folder
 // 6.1.0 - replace the mock users
 // 6.1.1 - maybe decouple structs DTOs from code files
 // 6.2 - create graphql endpoints mirroring the rest ones

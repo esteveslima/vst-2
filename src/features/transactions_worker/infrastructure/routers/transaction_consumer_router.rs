@@ -1,8 +1,8 @@
 use crate::{
-    features::transactions_worker::adapters::entrypoints::consumers::stock_order_consumer::StockOrderConsumer,
-    infrastructure::clients::stream::stream_consumer_client::{
+    common::infrastructure::clients::stream::stream_consumer_client::{
         StreamConsumerClient, StreamConsumerClientImpl, StreamConsumerClientListenParametersDTO,
     },
+    features::transactions_worker::adapters::entrypoints::consumers::stock_order_consumer::StockOrderConsumer,
 };
 
 pub async fn setup_consumer_router<'a: 'static>(

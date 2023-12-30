@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std;
 
 use crate::{
-    application::interfaces::use_case::UseCase,
+    common::application::interfaces::use_case::UseCase,
     features::stocks_api::{
         application::interfaces::gateways::producers::stock_order_producer_gateway::{
             ProduceStockOrderParametersDTO, ProduceStockOrderPayloadParametersDTO,
