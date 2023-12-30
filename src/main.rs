@@ -1,5 +1,6 @@
 use common::infrastructure::{
     configurations::env::env_loader,
+    factories::common_gateways_factory::{CommonGateways, CommonGatewaysFactory},
     runners::{
         stream_consumer_runner::{self, StreamConsumerRunnerInstances},
         web_server_runner::{self, WebServerRunnerInstances},
@@ -29,16 +30,17 @@ pub mod features {
 extern crate lazy_static;
 lazy_static! {
     // stocks_api instances pool
-    static ref STOCKS_API_GATEWAYS_INSTANCES: StockGateways<'static> = {
+    static ref COMMON_GATEWAYS_INSTANCES: CommonGateways<'static> = {
         let handle = tokio::runtime::Handle::current();
         std::thread::spawn(move || {
             handle.block_on(async {
-                StockGateways::build().await
+                CommonGateways::build().await
             })
         }).join().unwrap()
     };
+    static ref STOCKS_API_GATEWAYS_INSTANCES: StockGateways<'static> = StockGateways::build();
     static ref STOCKS_API_USE_CASES_INSTANCES: StockUseCases<'static> =
-        StockUseCases::build(&STOCKS_API_GATEWAYS_INSTANCES);
+        StockUseCases::build(&COMMON_GATEWAYS_INSTANCES, &STOCKS_API_GATEWAYS_INSTANCES);
     static ref STOCKS_API_ENTRYPOINTS_INSTANCES: StockEntrypoints<'static> =
         StockEntrypoints::build(&STOCKS_API_USE_CASES_INSTANCES);
 
@@ -46,7 +48,7 @@ lazy_static! {
     static ref TRANSACTIONS_WORKER_GATEWAYS_INSTANCES: TransactionGateways<'static> =
         TransactionGateways::build();
     static ref TRANSACTIONS_WORKER_USE_CASES_INSTANCES: TransactionUseCases<'static> =
-        TransactionUseCases::build(&TRANSACTIONS_WORKER_GATEWAYS_INSTANCES);
+        TransactionUseCases::build(&COMMON_GATEWAYS_INSTANCES, &TRANSACTIONS_WORKER_GATEWAYS_INSTANCES);
     static ref TRANSACTIONS_WORKER_ENTRYPOINTS_INSTANCES: TransactionEntrypoints<'static> =
         TransactionEntrypoints::build(&TRANSACTIONS_WORKER_USE_CASES_INSTANCES);
 }

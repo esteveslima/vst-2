@@ -3,7 +3,16 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std;
 
-use crate::{common::application::interfaces::use_case::UseCase, features::{stocks_api::application::interfaces::gateways::daos::stock_order_transaction_dao_gateway::{StockOrderTransactionDAOGateway, GetWalletParametersDTO, GetWalletHistoricalStatisticsParametersDTO}, transactions_worker::domain::entities::stock_order_transaction::StockOrderTransactionOperation}};
+use crate::{
+    common::application::interfaces::{
+        gateways::daos::stock_order_transaction_dao_gateway::{
+            GetWalletHistoricalStatisticsParametersDTO, GetWalletParametersDTO,
+            StockOrderTransactionDAOGateway,
+        },
+        use_case::UseCase,
+    },
+    features::transactions_worker::domain::entities::stock_order_transaction::StockOrderTransactionOperation,
+};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct GetStocksSummaryParametersDTO {
@@ -94,17 +103,17 @@ impl<'a> UseCase<GetStocksSummaryParametersDTO, GetStocksSummaryResultDTO>
             )));
         }
 
-        let wallet = wallet_result.unwrap();
-        let wallet_historical_statistics = wallet_historical_statistics_result.unwrap();
+        let wallet_data = wallet_result.unwrap();
+        let wallet_historical_statistics_data = wallet_historical_statistics_result.unwrap();
 
-        let wallet_clone = wallet.clone();
+        let wallet_clone = wallet_data.clone();
 
         let result = GetStocksSummaryResultDTO {
             stocks: wallet_clone
                 .wallet
                 .iter()
                 .map(move |owned_stock| {
-                    let matching_stock_wallet_statistics = wallet_historical_statistics
+                    let matching_stock_wallet_statistics = wallet_historical_statistics_data
                         .data
                         .iter()
                         .find(|data| {

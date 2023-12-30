@@ -16,9 +16,6 @@ pub mod adapters {
         }
     }
     pub mod gateways {
-        pub mod daos {
-            pub mod stock_order_transaction_dao_gateway_impl;
-        }
         pub mod producers {
             pub mod stock_order_producer_gateway_impl;
         }
@@ -28,9 +25,6 @@ pub mod adapters {
 pub mod application {
     pub mod interfaces {
         pub mod gateways {
-            pub mod daos {
-                pub mod stock_order_transaction_dao_gateway;
-            }
             pub mod producers {
                 pub mod stock_order_producer_gateway;
             }

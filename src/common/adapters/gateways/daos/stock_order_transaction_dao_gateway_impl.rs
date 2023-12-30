@@ -4,14 +4,14 @@ use async_trait::async_trait;
 use chrono::DateTime;
 use tokio_postgres::Client;
 
-use crate::features::{
-    stocks_api::application::interfaces::gateways::daos::stock_order_transaction_dao_gateway::{
+use crate::{
+    common::application::interfaces::gateways::daos::stock_order_transaction_dao_gateway::{
         GetWalletHistoricalStatisticsParametersDTO, GetWalletHistoricalStatisticsResultDTO,
         GetWalletHistoricalStatisticsResultItemDTO, GetWalletParametersDTO, GetWalletResultDTO,
         GetWalletResultItemDTO, StockOrderTransactionDAOGateway,
         StockOrderTransactionDAOGatewayConstructor,
     },
-    transactions_worker::domain::entities::stock_order_transaction::StockOrderTransactionOperation,
+    features::transactions_worker::domain::entities::stock_order_transaction::StockOrderTransactionOperation,
 };
 
 struct PreBuiltQueries {
@@ -110,6 +110,7 @@ impl StockOrderTransactionDAOGatewayConstructor for StockOrderTransactionDAOGate
                         SUM(CASE WHEN (data->>'operation')::text = 'PURCHASE' THEN (data->>'price')::double ELSE 0 END) AS total_purchased_value,
                         SUM(CASE WHEN (data->>'operation')::text = 'SELL' THEN (data->>'price')::double ELSE 0 END) AS total_sold_value
                     FROM {stock_order_transaction_source_name}
+                    WHERE (data->>'status')::text = 'SUCCESS'
                     GROUP BY user_id, stock;
                     "
                 ),
@@ -145,6 +146,7 @@ impl StockOrderTransactionDAOGatewayConstructor for StockOrderTransactionDAOGate
                     (data->>'date')::text AS first_operation_date,
                     (data->>'price')::double AS first_operation_value
                 FROM {stock_order_transaction_source_name}
+                WHERE (data->>'status')::text = 'SUCCESS'
                 ORDER BY
                 (data->>'user_id')::text, 
                 (data->>'stock')::text, 
